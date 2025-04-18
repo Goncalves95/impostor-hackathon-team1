@@ -6,13 +6,13 @@ import { PortfolioProvider } from './context/PortfolioContext';
 // Componentes
 import Navbar from './components/layout/Navbar';
 import Home from './pages/Home';
-import Login from './components/login-sign/Login';
-import Register from './components/login-sign/Register';
-import Dashboard from './pages/Dashboard';
+import Login from '../../site/frontend/src/components/login-sign/Login';
+import Register from '../../site/frontend/src/components/login-sign/Register';
+import Dashboard from '../../site/frontend/src/pages/Dashboard';
 import Builder from './pages/Builder';
 import Preview from './pages/Preview';
 import GithubCallback from './components/github/GithubCallback';
-import PrivateRoute from './components/common/PrivateRoute';
+import PrivateRoute from '../../site/frontend/src/components/common/PrivateRoute';
 
 function App() {
   return (
