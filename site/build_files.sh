@@ -10,9 +10,9 @@ source venv/bin/activate
 pip install -r backend/requirements.txt
 
 # collect static files using the Python interpreter from venv
-python manage.py collectstatic --noinput
+python backend/manage.py collectstatic --noinput
 
 echo "BUILD END"
 
 # [optional] Start the application here 
-python manage.py runserver
+python backend/manage.py runserver
