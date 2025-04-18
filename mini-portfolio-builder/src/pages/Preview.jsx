@@ -76,7 +76,7 @@ function Preview() {
   };
 
   const handleShare = () => {
-    // Here you would implement the logic to share the portfolio
+    // Here we would implement the logic to share the portfolio
     // For example, generate a unique link or allow downloading as PDF
     alert('Sharing functionality will be implemented soon!');
   };

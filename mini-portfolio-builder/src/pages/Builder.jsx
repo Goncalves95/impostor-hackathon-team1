@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import BioForm from '../components/forms/BioForm';
 import ProjectForm from '../components/forms/PreojectForm';
 import SkillsForm from '../components/forms/SkillForm';
+import GithubConnect from '../components/github/GithubConnect';
+import GithubImport from '../components/github/GithubImport';
 import { usePortfolio } from '../context/PortfolioContext';
 
 const BuilderContainer = styled.div`
@@ -100,10 +102,16 @@ const NextButton = styled(Button)`
   }
 `;
 
+const SectionDivider = styled.div`
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 2rem 0;
+`;
+
 function Builder() {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
-  const { savePortfolio } = usePortfolio();
+  const { portfolioData, savePortfolio } = usePortfolio();
 
   const handleNext = () => {
     if (currentStep < 3) {
@@ -149,9 +157,40 @@ function Builder() {
       </StepIndicator>
 
       <FormContainer>
-        {currentStep === 1 && <BioForm />}
-        {currentStep === 2 && <ProjectForm />}
-        {currentStep === 3 && <SkillsForm />}
+        {currentStep === 1 && (
+          <>
+            <BioForm />
+            <SectionDivider />
+            <GithubConnect isConnected={portfolioData.github.connected} />
+            {portfolioData.github.connected && <GithubImport />}
+          </>
+        )}
+        
+        {currentStep === 2 && (
+          <>
+            <ProjectForm />
+            {portfolioData.github.connected && portfolioData.github.repos.length > 0 && (
+              <>
+                <SectionDivider />
+                <h3>GitHub Repositories</h3>
+                <p>You can import your GitHub repositories as projects using the GitHub tab in step 1.</p>
+              </>
+            )}
+          </>
+        )}
+        
+        {currentStep === 3 && (
+          <>
+            <SkillsForm />
+            {portfolioData.github.connected && portfolioData.github.languages.length > 0 && (
+              <>
+                <SectionDivider />
+                <h3>GitHub Languages</h3>
+                <p>You can import your GitHub programming languages as skills using the GitHub tab in step 1.</p>
+              </>
+            )}
+          </>
+        )}
 
         <ButtonsContainer>
           <BackButton 
