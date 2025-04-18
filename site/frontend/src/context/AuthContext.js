@@ -5,15 +5,15 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// Mock for one user to acess development envirement
+// Mock for one user to access development environment
 const mockUser = {
   id: 'dev-user-123',
-  username: 'usuarioteste',
-  email: 'teste@exemplo.com',
-  first_name: 'Usuário',
-  last_name: 'Teste',
+  username: 'testuser',
+  email: 'test@example.com',
+  first_name: 'Test',
+  last_name: 'User',
   profile: {
-    bio: 'Desenvolvedor em teste',
+    bio: 'Developer in testing',
     avatar: 'https://via.placeholder.com/150'
   }
 };
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
           const useMock = localStorage.getItem('useMockAuth') === 'true';
           
           if (useMock) {
-            console.log('🛠️ Usando autenticação mockada para desenvolvimento');
+            console.log('🛠️ Using mocked authentication for development');
             setCurrentUser(mockUser);
             setUsingMockAuth(true);
             setLoading(false);
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser(response.data);
           } catch (err) {
             if (process.env.NODE_ENV === 'development') {
-              console.log('🛠️ API falhou, usando autenticação mockada como fallback');
+              console.log('🛠️ API failed, using mocked authentication as fallback');
               setCurrentUser(mockUser);
               setUsingMockAuth(true);
             } else {
@@ -85,8 +85,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       if (process.env.NODE_ENV === 'development' && 
-          (username === 'teste' || username === mockUser.username || username === mockUser.email)) {
-        console.log('🛠️ Login mockado para desenvolvimento');
+          (username === 'test' || username === mockUser.username || username === mockUser.email)) {
+        console.log('🛠️ Mocked login for development');
         localStorage.setItem('useMockAuth', 'true');
         setCurrentUser(mockUser);
         setUsingMockAuth(true);
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
       return user;
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('🛠️ API de login falhou, usando mock como fallback');
+        console.log('🛠️ Login API failed, using mock as fallback');
         localStorage.setItem('useMockAuth', 'true');
         setCurrentUser(mockUser);
         setUsingMockAuth(true);
@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, email, password) => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log('🛠️ Registro mockado para desenvolvimento');
+        console.log('🛠️ Mocked registration for development');
         return true;
       }
 
@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }) => {
       return true;
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('🛠️ API de registro falhou, usando mock como fallback');
+        console.log('🛠️ Registration API failed, using mock as fallback');
         return true;
       }
       
@@ -198,13 +198,13 @@ export const AuthProvider = ({ children }) => {
           boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
         }}>
           <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
-            Modo de Desenvolvimento
+            Development Mode
           </div>
           <div style={{ marginBottom: '8px' }}>
-            Status: {currentUser ? '✅ Autenticado' : '❌ Não Autenticado'}
+            Status: {currentUser ? '✅ Authenticated' : '❌ Not Authenticated'}
           </div>
           <div style={{ marginBottom: '8px' }}>
-            Usando Mock: {usingMockAuth ? '✅ Sim' : '❌ Não'}
+            Using Mock: {usingMockAuth ? '✅ Yes' : '❌ No'}
           </div>
           <button 
             onClick={toggleMockAuth}
@@ -218,7 +218,7 @@ export const AuthProvider = ({ children }) => {
               width: '100%'
             }}
           >
-            {usingMockAuth ? 'Desativar Mock' : 'Ativar Mock'}
+            {usingMockAuth ? 'Disable Mock' : 'Enable Mock'}
           </button>
         </div>
       )}
