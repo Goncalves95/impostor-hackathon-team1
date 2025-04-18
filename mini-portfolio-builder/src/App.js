@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { PortfolioProvider } from './context/PortfolioContext';
+import GithubCallback from './components/github/GithubCallback';
 import './styles/global.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/builder" element={<Builder />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/github/callback" element={<GithubCallback />} />
           </Routes>
         </main>
         <Footer />
