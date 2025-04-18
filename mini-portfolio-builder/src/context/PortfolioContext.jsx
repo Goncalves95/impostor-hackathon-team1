@@ -16,6 +16,13 @@ export const PortfolioProvider = ({ children }) => {
     },
     projects: [],
     skills: [],
+    github: {
+      connected: false,
+      token: null,
+      repos: [],
+      languages: [],
+      stats: null,
+    }
   });
 
   const updateBio = (bioData) => {
@@ -75,17 +82,169 @@ export const PortfolioProvider = ({ children }) => {
     }
   };
 
+  // GitHub Integration functions
+
+  const setGithubToken = (token) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      github: {
+        ...prev.github,
+        connected: true,
+        token
+      }
+    }));
+    // Após salvar o token, você pode chamar funções para buscar dados do GitHub
+    fetchGithubData(token);
+  };
+
+  const fetchGithubData = async (token) => {
+    try {
+      // Buscar repositórios
+      const reposResponse = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', {
+        headers: {
+          Authorization: `token ${token}`
+        }
+      });
+      const repos = await reposResponse.json();
+
+      // Buscar dados do usuário
+      const userResponse = await fetch('https://api.github.com/user', {
+        headers: {
+          Authorization: `token ${token}`
+        }
+      });
+      const userData = await userResponse.json();
+
+      // Processar linguagens de programação dos repositórios
+      const languages = {};
+      const languagePromises = repos.slice(0, 10).map(repo => 
+        fetch(repo.languages_url, {
+          headers: {
+            Authorization: `token ${token}`
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          Object.keys(data).forEach(lang => {
+            languages[lang] = (languages[lang] || 0) + data[lang];
+          });
+        })
+      );
+
+      await Promise.all(languagePromises);
+
+      // Salvar dados no contexto
+      setPortfolioData(prev => ({
+        ...prev,
+        bio: {
+          ...prev.bio,
+          github: userData.html_url || prev.bio.github,
+        },
+        github: {
+          ...prev.github,
+          repos: repos.map(repo => ({
+            id: repo.id,
+            name: repo.name,
+            description: repo.description,
+            url: repo.html_url,
+            stars: repo.stargazers_count,
+            forks: repo.forks_count,
+            language: repo.language,
+          })),
+          languages: Object.entries(languages).map(([name, bytes]) => ({
+            name,
+            bytes,
+            percentage: 0, // Calcular depois
+          })),
+          stats: {
+            totalRepos: userData.public_repos,
+            followers: userData.followers,
+            following: userData.following,
+          }
+        }
+      }));
+
+      // Calcular porcentagens das linguagens
+      const totalBytes = Object.values(languages).reduce((sum, bytes) => sum + bytes, 0);
+      setPortfolioData(prev => ({
+        ...prev,
+        github: {
+          ...prev.github,
+          languages: prev.github.languages.map(lang => ({
+            ...lang,
+            percentage: Math.round((lang.bytes / totalBytes) * 100)
+          }))
+        }
+      }));
+
+    } catch (error) {
+      console.error('Error fetching GitHub data:', error);
+    }
+  };
+
+  const disconnectGithub = () => {
+    setPortfolioData(prev => ({
+      ...prev,
+      github: {
+        connected: false,
+        token: null,
+        repos: [],
+        languages: [],
+        stats: null,
+      }
+    }));
+  };
+
+  const importGithubReposAsProjects = (selectedRepos) => {
+    const newProjects = selectedRepos.map(repo => ({
+      title: repo.name,
+      description: repo.description || `A repository on GitHub called ${repo.name}`,
+      technologies: [repo.language].filter(Boolean),
+      link: repo.url,
+      image: '' // Você poderia adicionar uma screenshot padrão aqui
+    }));
+
+    setPortfolioData(prev => ({
+      ...prev,
+      projects: [...prev.projects, ...newProjects]
+    }));
+  };
+
+  const importGithubLanguagesAsSkills = () => {
+    const newSkills = portfolioData.github.languages
+      .filter(lang => lang.percentage >= 5) // Apenas linguagens com relevância
+      .map(lang => ({
+        name: lang.name,
+        category: 'technical'
+      }));
+
+    setPortfolioData(prev => ({
+      ...prev,
+      skills: [...prev.skills, ...newSkills.filter(newSkill => 
+        !prev.skills.some(skill => 
+          skill.name.toLowerCase() === newSkill.name.toLowerCase() && skill.category === 'technical'
+        )
+      )]
+    }));
+  };
+  
   return (
-    <PortfolioContext.Provider value={{
-      portfolioData,
-      updateBio,
-      addProject,
-      updateProject,
-      removeProject,
-      addSkill,
-      removeSkill,
-      savePortfolio
-    }}>
+    <PortfolioContext.Provider
+      value={{
+        portfolioData,
+        updateBio,
+        addProject,
+        updateProject,
+        removeProject,
+        addSkill,
+        removeSkill,
+        savePortfolio,
+        setGithubToken,
+        disconnectGithub,
+        importGithubReposAsProjects,
+        importGithubLanguagesAsSkills
+      }}
+    >
       {children}
     </PortfolioContext.Provider>
   );
