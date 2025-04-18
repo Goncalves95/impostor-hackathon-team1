@@ -59,6 +59,17 @@ Mini Portfolio Builder is a simple, fast, and effective web application that all
 
 ## Deployment
 
+### Development
+
+To run the Docker container for development, follow these steps:
+
+1. Install and run Docker Desktop on your computer
+2. Open the repository in your preferred IDE
+3. Navigate to the `site` folder (`cd site`)
+4. Run `docker-compose build` to build the image
+5. Run `docker-compose up` to run the site on localhost:3000
+6. Instead of 4 and 5, you can also run `docker-compose up --build` to combine the steps
+
 ### Hosting
 *(To be filled with hosting information)*
 
