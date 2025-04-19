@@ -99,7 +99,6 @@ export const PortfolioProvider = ({ children }) => {
 
   const fetchGithubData = async (token) => {
     try {
-      // Buscar repositórios
       const reposResponse = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', {
         headers: {
           Authorization: `token ${token}`
@@ -107,7 +106,6 @@ export const PortfolioProvider = ({ children }) => {
       });
       const repos = await reposResponse.json();
 
-      // Buscar dados do usuário
       const userResponse = await fetch('https://api.github.com/user', {
         headers: {
           Authorization: `token ${token}`
@@ -115,7 +113,6 @@ export const PortfolioProvider = ({ children }) => {
       });
       const userData = await userResponse.json();
 
-      // Processar linguagens de programação dos repositórios
       const languages = {};
       const languagePromises = repos.slice(0, 10).map(repo => 
         fetch(repo.languages_url, {
@@ -133,7 +130,6 @@ export const PortfolioProvider = ({ children }) => {
 
       await Promise.all(languagePromises);
 
-      // Salvar dados no contexto
       setPortfolioData(prev => ({
         ...prev,
         bio: {
@@ -154,7 +150,7 @@ export const PortfolioProvider = ({ children }) => {
           languages: Object.entries(languages).map(([name, bytes]) => ({
             name,
             bytes,
-            percentage: 0, // Calcular depois
+            percentage: 0,
           })),
           stats: {
             totalRepos: userData.public_repos,
@@ -164,7 +160,6 @@ export const PortfolioProvider = ({ children }) => {
         }
       }));
 
-      // Calcular porcentagens das linguagens
       const totalBytes = Object.values(languages).reduce((sum, bytes) => sum + bytes, 0);
       setPortfolioData(prev => ({
         ...prev,
@@ -201,7 +196,7 @@ export const PortfolioProvider = ({ children }) => {
       description: repo.description || `A repository on GitHub called ${repo.name}`,
       technologies: [repo.language].filter(Boolean),
       link: repo.url,
-      image: '' // Você poderia adicionar uma screenshot padrão aqui
+      image: ''
     }));
 
     setPortfolioData(prev => ({
@@ -212,7 +207,7 @@ export const PortfolioProvider = ({ children }) => {
 
   const importGithubLanguagesAsSkills = () => {
     const newSkills = portfolioData.github.languages
-      .filter(lang => lang.percentage >= 5) // Apenas linguagens com relevância
+      .filter(lang => lang.percentage >= 5)
       .map(lang => ({
         name: lang.name,
         category: 'technical'
