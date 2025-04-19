@@ -11,6 +11,7 @@ import Register from '../src/components/login-sign/Register';
 import Dashboard from '../src/pages/Dashboard';
 import Builder from './pages/Builder';
 import Preview from './pages/Preview';
+import AboutPage from './pages/About';
 import GithubCallback from './components/github/GithubCallback';
 import PrivateRoute from '../src/components/common/PrivateRoute';
 
@@ -22,6 +23,7 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/github/callback" element={<GithubCallback />} />
