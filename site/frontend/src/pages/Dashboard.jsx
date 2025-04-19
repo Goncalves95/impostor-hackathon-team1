@@ -100,7 +100,6 @@ function Dashboard() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Function to toggle between grid and list view
   const toggleViewMode = () => {
     setViewMode(viewMode === 'grid' ? 'list' : 'grid');
   };
@@ -114,13 +113,11 @@ function Dashboard() {
     );
   }
 
-  // Calculate stats for dashboard display
   const totalViews = savedPortfolios.reduce((sum, portfolio) => sum + (portfolio.views || 0), 0);
   const totalShares = savedPortfolios.reduce((sum, portfolio) => sum + (portfolio.shares || 0), 0);
 
   return (
     <div className="dashboard-container">
-      {/* Background elements */}
       <div className="dashboard-bg-elements">
         <div className="dashboard-bg-circle circle-1"></div>
         <div className="dashboard-bg-circle circle-2"></div>
@@ -178,7 +175,6 @@ function Dashboard() {
           
           <div className="profile-preview">
             <div className="profile-image">
-              {/* This would be the user's profile image, using a fallback for now */}
               <span className="profile-initial">{(currentUser?.username || 'U')[0].toUpperCase()}</span>
             </div>
             <div className="profile-stats">
