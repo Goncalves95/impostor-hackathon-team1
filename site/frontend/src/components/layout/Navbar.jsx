@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 
@@ -69,7 +69,9 @@ function Navbar() {
   return (
     <Nav>
       <NavContainer>
-        <Logo to="/">Mini Portfolio Builder</Logo>
+        <Logo to="/">
+        <span>📝</span>Level Up Hub
+        </Logo>
         
         <NavLinks>
           <NavLink to="/">Home</NavLink>
@@ -78,6 +80,9 @@ function Navbar() {
             <>
               <NavLink to="/dashboard">Dashboard</NavLink>
               <NavLink to="/builder">Create Portfolio</NavLink>
+              <NavLink to="/preview">
+            Preview
+            </NavLink>
               <Button onClick={handleLogout}>Logout</Button>
             </>
           ) : (
