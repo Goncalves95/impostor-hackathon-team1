@@ -71,7 +71,7 @@ function Preview() {
       linkedin: "linkedin.com/in/alexmorgan",
       github: "github.com/alexmorgan",
       website: "alexmorgan.dev",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop"
+      avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=300&auto=format"
     },
     projects: portfolioData.projects.length > 0 ? portfolioData.projects : [
       {

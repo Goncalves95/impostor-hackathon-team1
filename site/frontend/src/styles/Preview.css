@@ -1,12 +1,10 @@
-/* Preview.css */
 .preview-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
     position: relative;
   }
-  
-  /* Background Elements */
+
   .preview-bg-elements {
     position: absolute;
     top: 0;
