@@ -38,14 +38,12 @@ function Home() {
 
   return (
     <div className="home-container">
-      {/* Impostor Syndrome Themed Floating Elements */}
       <div className="floating-elements">
         <div className="floating-element mask-element"></div>
         <div className="floating-element shadow-element"></div>
         <div className="floating-element light-element"></div>
       </div>
 
-      {/* Hero Section with Animation */}
       <motion.section 
         className="hero-section"
         initial={{ opacity: 0, y: 30 }}
@@ -93,7 +91,6 @@ function Home() {
         </div>
       </motion.section>
 
-      {/* Features Section with Staggered Animation */}
       <motion.section 
         className="features-section"
         variants={containerVariants}
@@ -138,7 +135,6 @@ function Home() {
         </div>
       </motion.section>
       
-      {/* Testimonial Section - Reinforcing confidence message */}
       <section className="testimonial-section">
         <div className="testimonial-container">
           <h2 className="section-title">From Self-Doubt to Showcase</h2>
@@ -161,7 +157,6 @@ function Home() {
         </div>
       </section>
       
-      {/* Final CTA Section */}
       <motion.section 
         className="final-cta"
         initial={{ opacity: 0 }}
