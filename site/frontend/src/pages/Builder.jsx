@@ -13,21 +13,18 @@ function Builder() {
   const navigate = useNavigate();
   const { portfolioData, savePortfolio } = usePortfolio();
 
-  // Função para determinar a classe do número do passo
   const getStepNumberClass = (step) => {
     if (step < currentStep) return 'step-number completed';
     if (step === currentStep) return 'step-number active';
     return 'step-number inactive';
   };
 
-  // Função para determinar a classe do texto do passo
   const getStepTextClass = (step) => {
     if (step < currentStep) return 'step-text completed';
     if (step === currentStep) return 'step-text active';
     return 'step-text inactive';
   };
 
-  // Função para determinar a classe do conector
   const getConnectorClass = (index) => {
     if (currentStep > index + 1) return 'step-connector-progress full';
     if (currentStep === index + 1) return 'step-connector-progress half';

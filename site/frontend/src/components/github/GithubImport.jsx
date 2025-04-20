@@ -6,86 +6,91 @@ function GithubImport() {
   const { portfolioData, setPortfolioData } = usePortfolio();
   const [importedRepos, setImportedRepos] = useState([]);
   const [importedLanguages, setImportedLanguages] = useState([]);
-  
+
   const availableRepos = portfolioData.github?.repos || [];
   const availableLanguages = portfolioData.github?.languages || [];
-  
+
   const handleImportRepo = (repo) => {
-    const alreadyExists = portfolioData.projects.some(project => 
+    const alreadyExists = portfolioData.projects.some(project =>
       project.githubId === repo.id
     );
-    
+
     if (alreadyExists) {
       return;
     }
-    
+
     const newProject = {
       id: Date.now(),
       githubId: repo.id,
       title: repo.name,
       description: repo.description || `GitHub repository: ${repo.name}`,
       technologies: [repo.language].filter(Boolean),
-      image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?q=80&w=2076&auto=format&fit=crop",
+      image: repo.image || "https://images.unsplash.com/photo-1556075798-4825dfaaf498?q=80&w=2076&auto=format&fit=crop",
       link: repo.html_url
     };
-    
+
     setPortfolioData(prev => ({
       ...prev,
       projects: [...prev.projects, newProject]
     }));
-    
+
     setImportedRepos(prev => [...prev, repo.id]);
   };
-  
+
   const handleImportLanguage = (language) => {
-    const alreadyExists = portfolioData.skills.some(skill => 
+    const alreadyExists = portfolioData.skills.some(skill =>
       skill.name.toLowerCase() === language.name.toLowerCase()
     );
-    
+
     if (alreadyExists) {
       return;
     }
-    
+
     const newSkill = {
       id: Date.now(),
       name: language.name,
       level: language.percentage,
     };
-    
+
     setPortfolioData(prev => ({
       ...prev,
       skills: [...prev.skills, newSkill]
     }));
-    
+
     setImportedLanguages(prev => [...prev, language.name]);
   };
-  
+
   const isRepoImported = (id) => {
-    return importedRepos.includes(id) || 
-           portfolioData.projects.some(project => project.githubId === id);
+    return importedRepos.includes(id) ||
+      portfolioData.projects.some(project => project.githubId === id);
   };
-  
+
   const isLanguageImported = (name) => {
-    return importedLanguages.includes(name) || 
-           portfolioData.skills.some(skill => 
-             skill.name.toLowerCase() === name.toLowerCase()
-           );
+    return importedLanguages.includes(name) ||
+      portfolioData.skills.some(skill =>
+        skill.name.toLowerCase() === name.toLowerCase()
+      );
   };
 
   return (
     <div className="github-import-container">
       <h3 className="github-import-title">Import from GitHub</h3>
-      
+
       {availableRepos.length > 0 && (
         <div className="github-section">
           <h4 className="github-section-title">Repositories</h4>
           <p className="github-section-description">
             Import your GitHub repositories as projects for your portfolio.
           </p>
-          
+
           <div className="github-repos-list">
             {availableRepos.map(repo => (
               <div className="github-repo-item" key={repo.id}>
+                {repo.image && (
+                  <div className="github-repo-image">
+                    <img src={repo.image} alt={repo.name} />
+                  </div>
+                )}
                 <div className="github-repo-info">
                   <div className="github-repo-name">{repo.name}</div>
                   <div className="github-repo-description">
@@ -94,7 +99,7 @@ function GithubImport() {
                   <div className="github-repo-meta">
                     {repo.language && (
                       <span className="github-repo-language">
-                        <span 
+                        <span
                           className="language-color"
                           style={{ backgroundColor: getLanguageColor(repo.language) }}
                         ></span>
@@ -106,7 +111,7 @@ function GithubImport() {
                     </span>
                   </div>
                 </div>
-                <button 
+                <button
                   className={`github-import-button ${isRepoImported(repo.id) ? 'imported' : ''}`}
                   onClick={() => handleImportRepo(repo)}
                   disabled={isRepoImported(repo.id)}
@@ -118,7 +123,7 @@ function GithubImport() {
           </div>
         </div>
       )}
-      
+
       {availableLanguages.length > 0 && (
         <div className="github-section">
           <h4 className="github-section-title">Programming Languages</h4>
@@ -153,7 +158,7 @@ function GithubImport() {
           </div>
         </div>
       )}
-      
+
       {availableRepos.length === 0 && availableLanguages.length === 0 && (
         <div className="github-empty-state">
           <p>No GitHub data available to import. Please make sure your GitHub account has public repositories.</p>
@@ -178,7 +183,7 @@ function getLanguageColor(language) {
     'C++': '#f34b7d',
     'C#': '#178600'
   };
-  
+
   return colors[language] || '#8b949e';
 }
 
