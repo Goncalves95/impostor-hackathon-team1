@@ -169,7 +169,7 @@ function Home() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Link to="/register" className="cta-button secondary">
+          <Link to="/builder" className="cta-button secondary">
             <span className="button-text">Get Started Now</span>
           </Link>
         </motion.div>

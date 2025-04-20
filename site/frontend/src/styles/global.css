@@ -8,7 +8,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #f5f7fb;
+  background-image: '/images/site/6900.jpg';
   color: #333;
   line-height: 1.5;
 }
@@ -23,4 +23,25 @@ button {
 
 input, textarea, select {
   font-family: 'Inter', sans-serif;
+}
+
+.main-content, body {
+  padding-bottom: 80px; 
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 80px;
+  padding-bottom: 80px;
 }

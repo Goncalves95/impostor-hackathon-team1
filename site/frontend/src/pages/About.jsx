@@ -207,7 +207,7 @@ const AboutPage = () => {
                   />
                 </div>
                 <div className="member-overlay">
-                  <div className="member-hover-content">View Profile</div>
+                  <div className="member-hover-content"></div>
                 </div>
               </div>
               
@@ -259,9 +259,9 @@ const AboutPage = () => {
                 <h3>Follow Us</h3>
                 <p>Stay updated with our latest features and news</p>
                 <div className="social-row">
-                  <a href="#" className="social-dot" title="Twitter">🐦</a>
-                  <a href="#" className="social-dot" title="Instagram">📸</a>
-                  <a href="#" className="social-dot" title="LinkedIn">💼</a>
+                  <a href="https://x.com/" className="social-dot" title="X">🐦</a>
+                  <a href="https://www.instagram.com/" className="social-dot" title="Instagram">📸</a>
+                  <a href="https://www.linkedin.com/" className="social-dot" title="LinkedIn">💼</a>
                 </div>
               </div>
             </div>
