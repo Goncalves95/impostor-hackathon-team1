@@ -13,7 +13,7 @@ function Footer() {
             © {currentYear} Level Up Hub. All rights reserved.
           </p>
           <p className="footer-team">
-            Developed with ❤️ by the Hackathon team 1
+            Developed with ❤️ by The Last of Us 
           </p>
         </div>
         

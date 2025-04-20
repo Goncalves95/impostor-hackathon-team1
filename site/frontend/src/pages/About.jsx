@@ -156,7 +156,7 @@ const AboutPage = () => {
             transition={{ delay: 0.5, duration: 0.5 }}
           >
             <div className="image-frame">
-              <img src="/images/project-screenshot.png" alt="Project screenshot" className="project-image" />
+              <img src="/images/site/siteInAction.png" alt="Project screenshot" className="project-image" />
               <div className="image-shadow"></div>
             </div>
             <div className="image-caption">Our portfolio builder in action</div>
