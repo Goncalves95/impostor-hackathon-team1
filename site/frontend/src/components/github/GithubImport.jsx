@@ -1,276 +1,185 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { usePortfolio } from '../../context/PortfolioContext';
-
-const ImportContainer = styled.div`
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background-color: #f6f8fa;
-  border-radius: 10px;
-  border: 1px solid #e1e4e8;
-`;
-
-const ImportTitle = styled.h3`
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #24292e;
-`;
-
-const StatsContainer = styled.div`
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-`;
-
-const StatItem = styled.div`
-  text-align: center;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #24292e;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.9rem;
-  color: #586069;
-`;
-
-const ImportSection = styled.div`
-  margin-top: 1.5rem;
-`;
-
-const SectionTitle = styled.h4`
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: #24292e;
-`;
-
-const RepoList = styled.div`
-  max-height: 300px;
-  overflow-y: auto;
-  margin-bottom: 1rem;
-  border: 1px solid #e1e4e8;
-  border-radius: 5px;
-`;
-
-const RepoItem = styled.div`
-  display: flex;
-  padding: 0.8rem;
-  border-bottom: 1px solid #e1e4e8;
-  align-items: center;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const RepoCheckbox = styled.input`
-  margin-right: 1rem;
-`;
-
-const RepoInfo = styled.div`
-  flex-grow: 1;
-`;
-
-const RepoName = styled.div`
-  font-weight: bold;
-  color: #0366d6;
-`;
-
-const RepoDescription = styled.div`
-  font-size: 0.9rem;
-  color: #586069;
-  margin-top: 0.3rem;
-`;
-
-const LanguagesList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-`;
-
-const LanguageItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-`;
-
-const LanguageColor = styled.span`
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: ${props => props.color || '#ccc'};
-`;
-
-const LanguageName = styled.span`
-  color: #24292e;
-`;
-
-const LanguagePercentage = styled.span`
-  color: #586069;
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const Button = styled.button`
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s, transform 0.2s;
-  
-  &:hover {
-    transform: translateY(-2px);
-  }
-`;
-
-const ImportButton = styled(Button)`
-  background-color: #28a745;
-  color: white;
-
-  &:hover {
-    background-color: #22863a;
-  }
-`;
-
-const DisconnectButton = styled(Button)`
-  background-color: #e0e0e0;
-  color: #333;
-
-  &:hover {
-    background-color: #d0d0d0;
-  }
-`;
-
-const languageColors = {
-  JavaScript: '#f1e05a',
-  TypeScript: '#2b7489',
-  Python: '#3572A5',
-  Java: '#b07219',
-  HTML: '#e34c26',
-  CSS: '#563d7c',
-  Ruby: '#701516',
-  Go: '#00ADD8',
-  PHP: '#4F5D95',
-  C: '#555555',
-  'C++': '#f34b7d',
-  'C#': '#178600',
-  Swift: '#ffac45',
-  Kotlin: '#F18E33',
-  Rust: '#dea584',
-};
+import '../../styles/GithubImport.css';
 
 function GithubImport() {
-  const { portfolioData, disconnectGithub, importGithubReposAsProjects, importGithubLanguagesAsSkills } = usePortfolio();
-  const [selectedRepos, setSelectedRepos] = useState([]);
+  const { portfolioData, setPortfolioData } = usePortfolio();
+  const [importedRepos, setImportedRepos] = useState([]);
+  const [importedLanguages, setImportedLanguages] = useState([]);
   
-  if (!portfolioData.github.connected) {
-    return null;
-  }
-
-  const { repos, languages, stats } = portfolioData.github;
-
-  const handleRepoToggle = (repo) => {
-    setSelectedRepos(prevSelected => {
-      const isSelected = prevSelected.some(r => r.id === repo.id);
-      if (isSelected) {
-        return prevSelected.filter(r => r.id !== repo.id);
-      } else {
-        return [...prevSelected, repo];
-      }
-    });
-  };
-
-  const handleImportRepos = () => {
-    if (selectedRepos.length > 0) {
-      importGithubReposAsProjects(selectedRepos);
-      setSelectedRepos([]);
+  const availableRepos = portfolioData.github?.repos || [];
+  const availableLanguages = portfolioData.github?.languages || [];
+  
+  const handleImportRepo = (repo) => {
+    const alreadyExists = portfolioData.projects.some(project => 
+      project.githubId === repo.id
+    );
+    
+    if (alreadyExists) {
+      return;
     }
+    
+    const newProject = {
+      id: Date.now(),
+      githubId: repo.id,
+      title: repo.name,
+      description: repo.description || `GitHub repository: ${repo.name}`,
+      technologies: [repo.language].filter(Boolean),
+      image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?q=80&w=2076&auto=format&fit=crop",
+      link: repo.html_url
+    };
+    
+    setPortfolioData(prev => ({
+      ...prev,
+      projects: [...prev.projects, newProject]
+    }));
+    
+    setImportedRepos(prev => [...prev, repo.id]);
   };
-
-  const handleImportLanguages = () => {
-    importGithubLanguagesAsSkills();
+  
+  const handleImportLanguage = (language) => {
+    const alreadyExists = portfolioData.skills.some(skill => 
+      skill.name.toLowerCase() === language.name.toLowerCase()
+    );
+    
+    if (alreadyExists) {
+      return;
+    }
+    
+    const newSkill = {
+      id: Date.now(),
+      name: language.name,
+      level: language.percentage,
+    };
+    
+    setPortfolioData(prev => ({
+      ...prev,
+      skills: [...prev.skills, newSkill]
+    }));
+    
+    setImportedLanguages(prev => [...prev, language.name]);
+  };
+  
+  const isRepoImported = (id) => {
+    return importedRepos.includes(id) || 
+           portfolioData.projects.some(project => project.githubId === id);
+  };
+  
+  const isLanguageImported = (name) => {
+    return importedLanguages.includes(name) || 
+           portfolioData.skills.some(skill => 
+             skill.name.toLowerCase() === name.toLowerCase()
+           );
   };
 
   return (
-    <ImportContainer>
-      <ImportTitle>GitHub Data</ImportTitle>
+    <div className="github-import-container">
+      <h3 className="github-import-title">Import from GitHub</h3>
       
-      {stats && (
-        <StatsContainer>
-          <StatItem>
-            <StatValue>{stats.totalRepos}</StatValue>
-            <StatLabel>Repositories</StatLabel>
-          </StatItem>
-          <StatItem>
-            <StatValue>{stats.followers}</StatValue>
-            <StatLabel>Followers</StatLabel>
-          </StatItem>
-          <StatItem>
-            <StatValue>{stats.following}</StatValue>
-            <StatLabel>Following</StatLabel>
-          </StatItem>
-        </StatsContainer>
+      {availableRepos.length > 0 && (
+        <div className="github-section">
+          <h4 className="github-section-title">Repositories</h4>
+          <p className="github-section-description">
+            Import your GitHub repositories as projects for your portfolio.
+          </p>
+          
+          <div className="github-repos-list">
+            {availableRepos.map(repo => (
+              <div className="github-repo-item" key={repo.id}>
+                <div className="github-repo-info">
+                  <div className="github-repo-name">{repo.name}</div>
+                  <div className="github-repo-description">
+                    {repo.description || 'No description available'}
+                  </div>
+                  <div className="github-repo-meta">
+                    {repo.language && (
+                      <span className="github-repo-language">
+                        <span 
+                          className="language-color"
+                          style={{ backgroundColor: getLanguageColor(repo.language) }}
+                        ></span>
+                        {repo.language}
+                      </span>
+                    )}
+                    <span className="github-repo-stars">
+                      ⭐ {repo.stargazers_count}
+                    </span>
+                  </div>
+                </div>
+                <button 
+                  className={`github-import-button ${isRepoImported(repo.id) ? 'imported' : ''}`}
+                  onClick={() => handleImportRepo(repo)}
+                  disabled={isRepoImported(repo.id)}
+                >
+                  {isRepoImported(repo.id) ? 'Imported' : 'Import'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
       
-      <ImportSection>
-        <SectionTitle>Programming Languages</SectionTitle>
-        <LanguagesList>
-          {languages.map((lang, index) => (
-            <LanguageItem key={index}>
-              <LanguageColor color={languageColors[lang.name] || '#ccc'} />
-              <LanguageName>{lang.name}</LanguageName>
-              <LanguagePercentage>{lang.percentage}%</LanguagePercentage>
-            </LanguageItem>
-          ))}
-        </LanguagesList>
-        <ImportButton onClick={handleImportLanguages}>
-          Import as Skills
-        </ImportButton>
-      </ImportSection>
+      {availableLanguages.length > 0 && (
+        <div className="github-section">
+          <h4 className="github-section-title">Programming Languages</h4>
+          <p className="github-section-description">
+            Import your most used programming languages as skills.
+          </p>
+          
+          <div className="github-languages-list">
+            {availableLanguages.map(language => (
+              <div className="github-language-item" key={language.name}>
+                <div className="github-language-info">
+                  <div className="github-language-name">
+                    <span 
+                      className="language-color large"
+                      style={{ backgroundColor: getLanguageColor(language.name) }}
+                    ></span>
+                    {language.name}
+                  </div>
+                  <div className="github-language-percentage">
+                    {language.percentage}%
+                  </div>
+                </div>
+                <button 
+                  className={`github-import-button ${isLanguageImported(language.name) ? 'imported' : ''}`}
+                  onClick={() => handleImportLanguage(language)}
+                  disabled={isLanguageImported(language.name)}
+                >
+                  {isLanguageImported(language.name) ? 'Imported' : 'Import'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       
-      <ImportSection>
-        <SectionTitle>Repositories</SectionTitle>
-        <RepoList>
-          {repos.map((repo) => (
-            <RepoItem key={repo.id}>
-              <RepoCheckbox 
-                type="checkbox"
-                checked={selectedRepos.some(r => r.id === repo.id)}
-                onChange={() => handleRepoToggle(repo)}
-              />
-              <RepoInfo>
-                <RepoName>{repo.name}</RepoName>
-                <RepoDescription>{repo.description || 'No description available'}</RepoDescription>
-              </RepoInfo>
-            </RepoItem>
-          ))}
-        </RepoList>
-        
-        <ButtonsContainer>
-          <ImportButton 
-            onClick={handleImportRepos}
-            disabled={selectedRepos.length === 0}
-          >
-            Import Selected as Projects
-          </ImportButton>
-          <DisconnectButton onClick={disconnectGithub}>
-            Disconnect GitHub
-          </DisconnectButton>
-        </ButtonsContainer>
-      </ImportSection>
-    </ImportContainer>
+      {availableRepos.length === 0 && availableLanguages.length === 0 && (
+        <div className="github-empty-state">
+          <p>No GitHub data available to import. Please make sure your GitHub account has public repositories.</p>
+        </div>
+      )}
+    </div>
   );
+}
+
+function getLanguageColor(language) {
+  const colors = {
+    JavaScript: '#f1e05a',
+    TypeScript: '#2b7489',
+    HTML: '#e34c26',
+    CSS: '#563d7c',
+    Python: '#3572A5',
+    Java: '#b07219',
+    Ruby: '#701516',
+    PHP: '#4F5D95',
+    Go: '#00ADD8',
+    C: '#555555',
+    'C++': '#f34b7d',
+    'C#': '#178600'
+  };
+  
+  return colors[language] || '#8b949e';
 }
 
 export default GithubImport;
