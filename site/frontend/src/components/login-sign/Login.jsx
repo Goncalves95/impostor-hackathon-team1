@@ -1,96 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-const LoginContainer = styled.div`
-  max-width: 450px;
-  margin: 4rem auto;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const Title = styled.h1`
-  text-align: center;
-  color: #333;
-  margin-bottom: 2rem;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #444;
-`;
-
-const Input = styled.input`
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-
-  &:focus {
-    border-color: #4a6cf7;
-    outline: none;
-  }
-`;
-
-const Button = styled.button`
-  padding: 0.8rem;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  background-color: #4a6cf7;
-  color: white;
-  font-size: 1rem;
-  transition: background-color 0.3s, transform 0.2s;
-
-  &:hover {
-    background-color: #3451b2;
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    background-color: #c0c0c0;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: #e53e3e;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-`;
-
-const LinkContainer = styled.div`
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-`;
-
-const StyledLink = styled(Link)`
-  color: #4a6cf7;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
+import '../../styles/AuthForms.css';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -100,7 +11,10 @@ function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,7 +31,7 @@ function Login() {
 
     try {
       await login(formData.username, formData.password);
-      navigate('/dashboard'); // Redirect to dashboard after login
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -126,45 +40,61 @@ function Login() {
   };
 
   return (
-    <LoginContainer>
-      <Title>Login to Your Account</Title>
+    <div className="auth-page-container">
+      <div className="auth-bg-elements">
+        <div className="auth-bg-circle circle-1"></div>
+        <div className="auth-bg-circle circle-2"></div>
+        <div className="auth-bg-grid"></div>
+      </div>
       
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label htmlFor="username">Username</Label>
-          <Input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </FormGroup>
+      <div className="auth-container">
+        <h1 className="auth-title">Login to Your Account</h1>
+        
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="username">Username</label>
+            <input
+              className="form-input"
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <FormGroup>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </FormGroup>
+          <div className="form-group">
+            <label className="form-label" htmlFor="password">Password</label>
+            <input
+              className="form-input"
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        {error && <ErrorMessage>{error}</ErrorMessage>}
+          {error && <div className="error-message">{error}</div>}
 
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </Button>
-      </Form>
+          <button className="auth-button" type="submit" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
 
-      <LinkContainer>
-        Don't have an account? <StyledLink to="/register">Register here</StyledLink>
-      </LinkContainer>
-    </LoginContainer>
+        <div className="link-container">
+          Don't have an account? <Link className="auth-link" to="/register">Register here</Link>
+        </div>
+        
+        <div className="back-home-container">
+          <Link to="/" className="back-home-link">
+            ← Back to Home Page
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
 
