@@ -16,7 +16,7 @@ import AboutPage from './pages/About';
 import GithubCallback from './components/github/GithubCallback';
 import PrivateRoute from '../src/components/common/PrivateRoute';
 
-import './styles/Global.css';
+import '../styles/Global.css';
 
 function App() {
   return (
