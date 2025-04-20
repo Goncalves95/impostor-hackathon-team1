@@ -1,8 +1,11 @@
 # Stage 1: Base build stage
 FROM python:3.13-slim AS builder
- 
+
+# Create the app directory
+RUN mkdir /backend
+
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /backend
  
 # Set environment variables to optimize Python
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -12,10 +15,10 @@ ENV PYTHONUNBUFFERED=1
 RUN pip install --upgrade pip 
  
 # Copy the requirements file first (better caching)
-COPY requirements.txt ./
+COPY requirements.txt /backend/
  
 # Install Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install -r /backend/requirements.txt
  
 # Stage 2: Production stage
 FROM python:3.13-slim
@@ -29,7 +32,7 @@ COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
  
 #Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /backend
  
 # Copy application code
 COPY --chown=appuser:appuser . .
@@ -42,7 +45,7 @@ ENV PYTHONUNBUFFERED=1
 USER appuser
  
 # Expose the application port
-EXPOSE 80
+EXPOSE 8000 
  
 # Start the application using Gunicorn
-CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "my_docker_django_app.wsgi:application"]
