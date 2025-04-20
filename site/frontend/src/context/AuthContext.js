@@ -5,60 +5,100 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// Mock for one user to access development environment
-const mockUser = {
-  id: 'dev-user-123',
-  username: 'testuser',
-  email: 'test@example.com',
-  first_name: 'Test',
+// Mock users for production/development preview
+const adminUser = {
+  id: 'admin-user-123',
+  username: 'admin',
+  email: 'admin@portfolio.com',
+  first_name: 'Admin',
   last_name: 'User',
+  role: 'admin',
   profile: {
-    bio: 'Developer in testing',
+    bio: 'System Administrator',
     avatar: 'https://via.placeholder.com/150'
   }
 };
+
+const demoUser = {
+  id: 'demo-user-123',
+  username: 'demo',
+  email: 'demo@portfolio.com',
+  first_name: 'Demo',
+  last_name: 'User',
+  role: 'user',
+  profile: {
+    bio: 'Portfolio creator enthusiast',
+    avatar: 'https://via.placeholder.com/150'
+  }
+};
+
+// List of predefined users that can "login" without a backend
+const predefinedUsers = [
+  adminUser,
+  demoUser,
+  // Add more demo accounts as needed
+];
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [usingMockAuth, setUsingMockAuth] = useState(false);
+  const [showDevTools, setShowDevTools] = useState(false);
+  
+  // Check if we're in dev mode with immediate mock login or production mode with demo login
+  const isDevMode = process.env.NODE_ENV === 'development';
+  const isImmediateMockLogin = isDevMode && localStorage.getItem('useMockAuth') === 'true';
+  const isUsingLocalAuth = !isDevMode || localStorage.getItem('useLocalAuth') === 'true';
 
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {
-        if (process.env.NODE_ENV === 'development') {
-          const useMock = localStorage.getItem('useMockAuth') === 'true';
-          
-          if (useMock) {
-            console.log('🛠️ Using mocked authentication for development');
-            setCurrentUser(mockUser);
-            setUsingMockAuth(true);
-            setLoading(false);
-            return;
-          }
+        // For immediate mock login in development
+        if (isImmediateMockLogin) {
+          console.log('🛠️ Using mocked authentication for development');
+          setCurrentUser(predefinedUsers[1]); // Using demo user by default
+          setLoading(false);
+          return;
         }
 
-        const token = localStorage.getItem('token');
-        
-        if (token) {
-          axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+        // Check if we should try real API or use local auth
+        if (!isUsingLocalAuth) {
+          const token = localStorage.getItem('token');
           
-          try {
-            const response = await axios.get('/api/user/');
-            setCurrentUser(response.data);
-          } catch (err) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('🛠️ API failed, using mocked authentication as fallback');
-              setCurrentUser(mockUser);
-              setUsingMockAuth(true);
-            } else {
-              throw err;
+          if (token) {
+            axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+            
+            try {
+              const response = await axios.get('/api/user/');
+              setCurrentUser(response.data);
+              setLoading(false);
+              return;
+            } catch (err) {
+              // API failed - fall back to local auth in production
+              if (!isDevMode) {
+                localStorage.setItem('useLocalAuth', 'true');
+                // Continue with local auth flow
+              } else {
+                // In dev, just clear auth and show login screen
+                localStorage.removeItem('token');
+                delete axios.defaults.headers.common['Authorization'];
+                setLoading(false);
+                return;
+              }
             }
           }
         }
+        
+        // Local authentication flow
+        const localUser = localStorage.getItem('localUser');
+        if (localUser) {
+          setCurrentUser(JSON.parse(localUser));
+        }
       } catch (err) {
+        console.error('Authentication error:', err);
+        // Clear any auth tokens
         localStorage.removeItem('token');
+        localStorage.removeItem('localUser');
         delete axios.defaults.headers.common['Authorization'];
       } finally {
         setLoading(false);
@@ -66,107 +106,184 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkUserLoggedIn();
-  }, []);
+    
+    // Enable dev tools with secret key combination
+    const handleKeyDown = (e) => {
+      // Ctrl + Shift + D to toggle dev tools
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        setShowDevTools(prev => !prev);
+        e.preventDefault();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDevMode, isImmediateMockLogin, isUsingLocalAuth]);
 
   const toggleMockAuth = () => {
-    if (process.env.NODE_ENV !== 'development') return;
+    if (!isDevMode) return;
     
-    if (usingMockAuth) {
+    if (isImmediateMockLogin) {
       localStorage.removeItem('useMockAuth');
       setCurrentUser(null);
-      setUsingMockAuth(false);
     } else {
       localStorage.setItem('useMockAuth', 'true');
-      setCurrentUser(mockUser);
-      setUsingMockAuth(true);
+      setCurrentUser(predefinedUsers[1]); // Using demo user by default
     }
   };
 
   const login = async (username, password) => {
     try {
-      if (process.env.NODE_ENV === 'development' && 
-          (username === 'test' || username === mockUser.username || username === mockUser.email)) {
-        console.log('🛠️ Mocked login for development');
-        localStorage.setItem('useMockAuth', 'true');
-        setCurrentUser(mockUser);
-        setUsingMockAuth(true);
-        return mockUser;
+      // Reset previous errors
+      setError(null);
+      
+      // For development immediate mock
+      if (isDevMode && isImmediateMockLogin) {
+        return predefinedUsers[1]; // Using demo user by default
       }
-
-      const response = await axios.post('/api/login/', {
-        username,
-        password
-      });
       
-      const { token, user } = response.data;
+      // Try using predefined users for local auth
+      if (isUsingLocalAuth) {
+        // Find matching predefined user
+        const user = predefinedUsers.find(u => 
+          (u.username === username || u.email === username) && password === `${username}123`
+        );
+        
+        if (user) {
+          localStorage.setItem('localUser', JSON.stringify(user));
+          setCurrentUser(user);
+          return user;
+        } else {
+          throw new Error('Invalid username or password');
+        }
+      }
       
-      localStorage.setItem('token', token);
-      
-      axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-      
-      setCurrentUser(user);
-      return user;
+      // Try real API
+      try {
+        const response = await axios.post('/api/login/', {
+          username,
+          password
+        });
+        
+        const { token, user } = response.data;
+        
+        localStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+        
+        setCurrentUser(user);
+        return user;
+      } catch (err) {
+        // If API fails in production, fall back to local auth
+        if (!isDevMode) {
+          localStorage.setItem('useLocalAuth', 'true');
+          
+          // Try local auth
+          return login(username, password);
+        }
+        
+        throw err;
+      }
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🛠️ Login API failed, using mock as fallback');
-        localStorage.setItem('useMockAuth', 'true');
-        setCurrentUser(mockUser);
-        setUsingMockAuth(true);
-        return mockUser;
-      }
-      
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.message || 'Login failed. Please check your credentials.');
       throw err;
     }
   };
 
   const register = async (username, email, password) => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🛠️ Mocked registration for development');
+      // Reset previous errors
+      setError(null);
+      
+      // For local auth, just create a new user in localStorage
+      if (isUsingLocalAuth) {
+        // Check if username/email already exists
+        const exists = predefinedUsers.some(u => 
+          u.username === username || u.email === email
+        );
+        
+        if (exists) {
+          throw new Error('Username or email already exists');
+        }
+        
+        // Create new user
+        const newUser = {
+          id: `user-${Date.now()}`,
+          username,
+          email,
+          first_name: '',
+          last_name: '',
+          role: 'user',
+          profile: {
+            bio: '',
+            avatar: 'https://via.placeholder.com/150'
+          }
+        };
+        
+        // Store in localStorage
+        localStorage.setItem('localUser', JSON.stringify(newUser));
+        setCurrentUser(newUser);
         return true;
       }
-
-      await axios.post('/api/register/', {
-        username,
-        email,
-        password
-      });
       
-      return true;
+      // Try real API
+      try {
+        await axios.post('/api/register/', {
+          username,
+          email,
+          password
+        });
+        
+        return true;
+      } catch (err) {
+        // If API fails in production, fall back to local auth
+        if (!isDevMode) {
+          localStorage.setItem('useLocalAuth', 'true');
+          
+          // Try local auth
+          return register(username, email, password);
+        }
+        
+        throw err;
+      }
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🛠️ Registration API failed, using mock as fallback');
-        return true;
-      }
-      
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.message || 'Registration failed. Please try again.');
       throw err;
     }
   };
 
   const logout = async () => {
     try {
-      if (usingMockAuth) {
-        localStorage.removeItem('useMockAuth');
+      // For local auth, just remove from localStorage
+      if (isUsingLocalAuth) {
+        localStorage.removeItem('localUser');
         setCurrentUser(null);
-        setUsingMockAuth(false);
         return;
       }
-
-      await axios.post('/api/logout/');
       
+      // Try real API
+      try {
+        await axios.post('/api/logout/');
+      } catch (err) {
+        // Ignore error, proceed with logout
+        console.warn('Logout API error (continuing):', err);
+      }
+      
+      // Clean up regardless of API success
       localStorage.removeItem('token');
       delete axios.defaults.headers.common['Authorization'];
       setCurrentUser(null);
     } catch (err) {
       console.error('Logout error:', err);
+      // Force logout on any error
       localStorage.removeItem('token');
-      localStorage.removeItem('useMockAuth');
+      localStorage.removeItem('localUser');
       delete axios.defaults.headers.common['Authorization'];
       setCurrentUser(null);
-      setUsingMockAuth(false);
     }
+  };
+
+  const isAdmin = () => {
+    return currentUser?.role === 'admin';
   };
 
   const value = {
@@ -176,15 +293,14 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    usingMockAuth,
-    toggleMockAuth,
-    isDevelopment: process.env.NODE_ENV === 'development'
+    isAdmin,
+    isDevelopment: isDevMode
   };
 
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}
-      {process.env.NODE_ENV === 'development' && (
+      {showDevTools && (
         <div style={{ 
           position: 'fixed', 
           bottom: '10px', 
@@ -198,18 +314,46 @@ export const AuthProvider = ({ children }) => {
           boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
         }}>
           <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
-            Development Mode
+            Development Tools (Ctrl+Shift+D)
           </div>
           <div style={{ marginBottom: '8px' }}>
             Status: {currentUser ? '✅ Authenticated' : '❌ Not Authenticated'}
           </div>
           <div style={{ marginBottom: '8px' }}>
-            Using Mock: {usingMockAuth ? '✅ Yes' : '❌ No'}
+            Mode: {isUsingLocalAuth ? '🔒 Local Auth' : '🌐 API Auth'}
           </div>
+          <div style={{ marginBottom: '8px' }}>
+            User: {currentUser?.username || 'None'}
+          </div>
+          <div style={{ marginBottom: '8px' }}>
+            Role: {currentUser?.role || 'None'}
+          </div>
+          
+          {isDevMode && (
+            <button 
+              onClick={toggleMockAuth}
+              style={{
+                backgroundColor: isImmediateMockLogin ? '#e74c3c' : '#2ecc71',
+                color: 'white',
+                border: 'none',
+                padding: '5px 10px',
+                borderRadius: '3px',
+                cursor: 'pointer',
+                width: '100%',
+                marginBottom: '8px'
+              }}
+            >
+              {isImmediateMockLogin ? 'Disable Auto-Mock' : 'Enable Auto-Mock'}
+            </button>
+          )}
+          
           <button 
-            onClick={toggleMockAuth}
+            onClick={() => {
+              localStorage.setItem('useLocalAuth', isUsingLocalAuth ? 'false' : 'true');
+              window.location.reload();
+            }}
             style={{
-              backgroundColor: usingMockAuth ? '#e74c3c' : '#2ecc71',
+              backgroundColor: '#3498db',
               color: 'white',
               border: 'none',
               padding: '5px 10px',
@@ -218,7 +362,7 @@ export const AuthProvider = ({ children }) => {
               width: '100%'
             }}
           >
-            {usingMockAuth ? 'Disable Mock' : 'Enable Mock'}
+            {isUsingLocalAuth ? 'Try API Auth' : 'Use Local Auth'}
           </button>
         </div>
       )}
