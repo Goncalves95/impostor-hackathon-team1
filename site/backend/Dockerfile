@@ -1,11 +1,11 @@
 # Stage 1: Base build stage
 FROM python:3.13-slim AS builder
  
-# Create the app directory
-RUN mkdir /backend
+# # Create the app directory
+# RUN mkdir /backend
  
-# Set the working directory
-WORKDIR /backend
+# # Set the working directory
+# WORKDIR /backend
  
 # Set environment variables to optimize Python
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -14,11 +14,11 @@ ENV PYTHONUNBUFFERED=1
 # Upgrade pip and install dependencies
 RUN pip install --upgrade pip 
  
-# # Copy the requirements file first (better caching)
-# COPY requirements.txt /backend/
+# Copy the requirements file first (better caching)
+COPY requirements.txt /
  
-# # Install Python dependencies
-# RUN pip install --no-cache-dir -r /backend/requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
  
 # Stage 2: Production stage
 FROM python:3.13-slim
@@ -32,7 +32,7 @@ COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
  
 # Set the working directory
-WORKDIR /backend
+# WORKDIR /backend
  
 # Copy application code
 COPY --chown=appuser:appuser . .
