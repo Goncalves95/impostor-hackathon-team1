@@ -1,152 +1,76 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { usePortfolio } from '../context/PortfolioContext';
 import axios from 'axios';
-
-const DashboardContainer = styled.div`
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  color: #333;
-`;
-
-const Button = styled.button`
-  padding: 0.7rem 1.2rem;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s, transform 0.2s;
-  background-color: ${props => props.primary ? '#4a6cf7' : props.danger ? '#e53e3e' : '#f0f0f0'};
-  color: ${props => props.primary || props.danger ? 'white' : '#333'};
-
-  &:hover {
-    background-color: ${props => props.primary ? '#3451b2' : props.danger ? '#c53030' : '#e0e0e0'};
-    transform: translateY(-2px);
-  }
-
-  &:not(:last-child) {
-    margin-right: 1rem;
-  }
-`;
-
-const Card = styled.div`
-  background-color: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-`;
-
-const CardTitle = styled.h2`
-  font-size: 1.3rem;
-  color: #333;
-  margin-bottom: 1rem;
-`;
-
-const PortfolioGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-`;
-
-const PortfolioCard = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const PortfolioCardImage = styled.div`
-  height: 150px;
-  background-color: #f0f0f0;
-  background-image: ${props => props.image ? `url(${props.image})` : 'none'};
-  background-size: cover;
-  background-position: center;
-`;
-
-const PortfolioCardContent = styled.div`
-  padding: 1rem;
-`;
-
-const PortfolioCardTitle = styled.h3`
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-`;
-
-const PortfolioCardDate = styled.p`
-  font-size: 0.8rem;
-  color: #777;
-  margin-bottom: 0.5rem;
-`;
-
-const PortfolioCardActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-`;
-
-const ProfileStats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const StatCard = styled.div`
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #4a6cf7;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 0.5rem;
-`;
+import '../styles/Dashboard.css';
 
 function Dashboard() {
   const { currentUser, logout } = useAuth();
   const { portfolioData } = usePortfolio();
   const [savedPortfolios, setSavedPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const navigate = useNavigate();
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { duration: 0.4 }
+    }
+  };
 
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
-        const response = await axios.get('/api/portfolios/');
-        setSavedPortfolios(response.data);
+        const mockPortfolios = [
+          {
+            id: 1,
+            title: "Professional Web Developer Portfolio",
+            thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
+            created_at: "2024-04-15T10:30:00Z",
+            views: 145,
+            shares: 12
+          },
+          {
+            id: 2,
+            title: "UX/UI Design Showcase",
+            thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
+            created_at: "2024-04-10T14:20:00Z",
+            views: 89,
+            shares: 5
+          },
+          {
+            id: 3,
+            title: "Mobile App Development Portfolio",
+            thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
+            created_at: "2024-03-25T09:15:00Z",
+            views: 210,
+            shares: 18
+          }
+        ];
+        
+        setTimeout(() => {
+          setSavedPortfolios(mockPortfolios);
+          setLoading(false);
+        }, 800);
+        
       } catch (err) {
         console.error('Error fetching portfolios:', err);
-      } finally {
         setLoading(false);
       }
     };
@@ -176,63 +100,227 @@ function Dashboard() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const toggleViewMode = () => {
+    setViewMode(viewMode === 'grid' ? 'list' : 'grid');
+  };
+
   if (loading) {
-    return <DashboardContainer>Loading...</DashboardContainer>;
+    return (
+      <div className="dashboard-loading">
+        <div className="loading-pulse"></div>
+        <p>Loading your portfolios...</p>
+      </div>
+    );
   }
 
+  const totalViews = savedPortfolios.reduce((sum, portfolio) => sum + (portfolio.views || 0), 0);
+  const totalShares = savedPortfolios.reduce((sum, portfolio) => sum + (portfolio.shares || 0), 0);
+
   return (
-    <DashboardContainer>
-      <Header>
-        <Title>Dashboard</Title>
-        <div>
-          <Button primary onClick={handleCreatePortfolio}>Create New Portfolio</Button>
-          <Button onClick={handleLogout}>Logout</Button>
+    <div className="dashboard-container">
+      <div className="dashboard-bg-elements">
+        <div className="dashboard-bg-circle circle-1"></div>
+        <div className="dashboard-bg-circle circle-2"></div>
+        <div className="dashboard-bg-line"></div>
+      </div>
+      
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1>Your Portfolio Dashboard</h1>
+          <p className="header-subtitle">
+            Track your progress and showcase your achievements
+          </p>
         </div>
-      </Header>
+        
+        <div className="header-actions">
+          <motion.button 
+            className="primary-button"
+            onClick={handleCreatePortfolio}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span className="button-icon">➕</span>
+            Create New Portfolio
+          </motion.button>
+          
+          <motion.button 
+            className="secondary-button"
+            onClick={handleLogout}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Logout
+          </motion.button>
+        </div>
+      </div>
 
-      <Card>
-        <CardTitle>Welcome, {currentUser.username}!</CardTitle>
-        <p>Manage your portfolio projects and profile settings from this dashboard.</p>
+      <motion.div 
+        className="dashboard-welcome-card"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="welcome-content">
+          <div className="welcome-text">
+            <h2>Welcome back, {currentUser?.username || 'User'}!</h2>
+            <p className="welcome-message">
+              Today is a great day to update your portfolio and showcase your accomplishments.
+              Remember, your work is valuable and deserves to be seen.
+            </p>
+            
+            <div className="impostor-quote">
+              <p>"Don't let impostor syndrome hold you back. Your skills are real, your achievements matter."</p>
+            </div>
+          </div>
+          
+          <div className="profile-preview">
+            <div className="profile-image">
+              <span className="profile-initial">{(currentUser?.username || 'U')[0].toUpperCase()}</span>
+            </div>
+            <div className="profile-stats">
+              <div className="stat-card">
+                <div className="stat-value">{savedPortfolios.length}</div>
+                <div className="stat-label">Portfolios</div>
+              </div>
+              
+              <div className="stat-card">
+                <div className="stat-value">{totalViews}</div>
+                <div className="stat-label">Views</div>
+              </div>
+              
+              <div className="stat-card">
+                <div className="stat-value">{totalShares}</div>
+                <div className="stat-label">Shares</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
-        <ProfileStats>
-          <StatCard>
-            <StatValue>{savedPortfolios.length}</StatValue>
-            <StatLabel>Portfolios</StatLabel>
-          </StatCard>
-          <StatCard>
-            <StatValue>{portfolioData.projects.length}</StatValue>
-            <StatLabel>Projects</StatLabel>
-          </StatCard>
-          <StatCard>
-            <StatValue>{portfolioData.skills.length}</StatValue>
-            <StatLabel>Skills</StatLabel>
-          </StatCard>
-        </ProfileStats>
-      </Card>
+      <motion.div 
+        className="dashboard-portfolios-section"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.6 }}
+      >
+        <div className="portfolios-header">
+          <h2>Your Portfolios</h2>
+          <div className="view-toggle">
+            <button 
+              className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`} 
+              onClick={() => setViewMode('grid')}
+            >
+              🔲 Grid
+            </button>
+            <button 
+              className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`} 
+              onClick={() => setViewMode('list')}
+            >
+              📋 List
+            </button>
+          </div>
+        </div>
 
-      <Card>
-        <CardTitle>Your Portfolios</CardTitle>
         {savedPortfolios.length === 0 ? (
-          <p>You haven't created any portfolios yet. Click "Create New Portfolio" to get started.</p>
+          <motion.div 
+            className="empty-state"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="empty-icon">📂</div>
+            <h3>No portfolios yet</h3>
+            <p>Create your first portfolio to showcase your skills and projects to the world.</p>
+            <motion.button 
+              className="primary-button"
+              onClick={handleCreatePortfolio}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Get Started
+            </motion.button>
+          </motion.div>
         ) : (
-          <PortfolioGrid>
+          <motion.div 
+            className={`portfolios-container ${viewMode}`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {savedPortfolios.map((portfolio) => (
-              <PortfolioCard key={portfolio.id}>
-                <PortfolioCardImage image={portfolio.thumbnail} />
-                <PortfolioCardContent>
-                  <PortfolioCardTitle>{portfolio.title}</PortfolioCardTitle>
-                  <PortfolioCardDate>Created: {formatDate(portfolio.created_at)}</PortfolioCardDate>
-                  <PortfolioCardActions>
-                    <Button primary onClick={() => handleViewPortfolio(portfolio.id)}>View</Button>
-                    <Button onClick={() => handleEditPortfolio(portfolio.id)}>Edit</Button>
-                  </PortfolioCardActions>
-                </PortfolioCardContent>
-              </PortfolioCard>
+              <motion.div 
+                key={portfolio.id} 
+                className="portfolio-card"
+                variants={itemVariants}
+                whileHover={{ y: -10, transition: { duration: 0.2 } }}
+              >
+                <div className="portfolio-thumbnail" style={{ backgroundImage: `url(${portfolio.thumbnail})` }}>
+                  <div className="portfolio-overlay">
+                    <div className="portfolio-date">Created: {formatDate(portfolio.created_at)}</div>
+                    <div className="portfolio-metrics">
+                      <span className="metric"><span className="metric-icon">👁️</span> {portfolio.views || 0}</span>
+                      <span className="metric"><span className="metric-icon">🔗</span> {portfolio.shares || 0}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="portfolio-content">
+                  <h3 className="portfolio-title">{portfolio.title}</h3>
+                  
+                  <div className="portfolio-actions">
+                    <button 
+                      className="action-button view-button" 
+                      onClick={() => handleViewPortfolio(portfolio.id)}
+                    >
+                      Preview
+                    </button>
+                    <button 
+                      className="action-button edit-button" 
+                      onClick={() => handleEditPortfolio(portfolio.id)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
             ))}
-          </PortfolioGrid>
+          </motion.div>
         )}
-      </Card>
-    </DashboardContainer>
+      </motion.div>
+
+      <motion.div 
+        className="dashboard-tips-section"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2>Tips to Overcome Impostor Syndrome</h2>
+        <div className="tips-container">
+          <div className="tip-card">
+            <div className="tip-icon">💡</div>
+            <h3>Document Your Achievements</h3>
+            <p>Keep a record of your accomplishments, big and small. Review them when self-doubt creeps in.</p>
+          </div>
+          
+          <div className="tip-card">
+            <div className="tip-icon">🗣️</div>
+            <h3>Share Your Knowledge</h3>
+            <p>Teaching others reinforces your expertise and helps you recognize how much you know.</p>
+          </div>
+          
+          <div className="tip-card">
+            <div className="tip-icon">🌱</div>
+            <h3>Embrace Growth</h3>
+            <p>View challenges as opportunities to learn, not tests that might expose inadequacy.</p>
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="dashboard-footer">
+        <p>Keep building, keep growing, keep showcasing your real potential.</p>
+      </div>
+    </div>
   );
 }
 

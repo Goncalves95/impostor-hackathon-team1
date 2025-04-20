@@ -1,61 +1,116 @@
-# Mini Portfolio Builder
+# Level Up Hub
 
 ## Overview
-Mini Portfolio Builder is a simple, fast, and effective web application that allows users to create professional portfolios in minutes. This React-based tool helps users showcase their personal information, projects, and skills in a clean, attractive format.
+Level Up Hub is a simple, fast, and effective web application that allows users to create professional portfolios in minutes. This React-based tool helps users showcase their personal information, projects, and skills in a clean, attractive format with modern design elements and seamless social integrations.
 
 ## Features
-- **Simple Interface**: Easy-to-navigate, step-by-step portfolio creation
-- **Portfolio Sections**: Personal information, projects, and skills
-- **Real-time Preview**: See your portfolio take shape as you build it
-- **Responsive Design**: Looks great on all devices
+- **Intuitive Builder Interface**: Easy-to-navigate, step-by-step portfolio creation
+- **Comprehensive Portfolio Sections**: Personal information, projects, skills, and contact details
+- **Real-time Preview**: See your portfolio take shape as you build it with responsive device previews (mobile, tablet, desktop)
+- **Responsive Design**: Looks great on all devices with adaptive layouts
+- **GitHub Integration**: Connect your GitHub account to automatically import repositories and programming languages
+- **Modern UI**: Clean, professional design with smooth animations and transitions
+- **Customizable Components**: Personalize your portfolio with various styling options
+- **Share Functionality**: Easily share your portfolio with potential employers or clients
 
 ## Application Structure
 
 ### Pages
-- **Home**: Landing page with feature highlights
-- **Builder**: Step-by-step portfolio creation form
-- **Preview**: Live preview of the created portfolio
+- **Home**: Landing page with feature highlights and value proposition
+- **Builder**: Step-by-step portfolio creation with integrated GitHub connectivity
+- **Preview**: Live preview of the created portfolio with different device views
+- **GitHub Callback**: Handler for OAuth authentication with GitHub
 
 ### Components
-- **Header**: Navigation bar
-- **Footer**: Page footer with copyright information
-- **Forms**: Bio, Projects, and Skills input forms
-- **Portfolio Sections**: Bio, Projects, and Skills display components
+- **Header**: Navigation bar with authentication status
+- **Footer**: Page footer with copyright and additional links
+- **Form Components**:
+  - BioForm: Personal information input with avatar upload
+  - ProjectForm: Project details with image upload capabilities
+  - SkillsForm: Technical skills with proficiency levels
+- **Portfolio Display Components**:
+  - BioSection: Profile display with contact information
+  - ProjectsSection: Gallery of projects with technology tags
+  - SkillsSection: Visual representation of skills with progress bars
+- **GitHub Components**:
+  - GithubConnect: Authentication and connection interface
+  - GithubImport: Repository and language import functionality
+- **UI Components**:
+  - DevicePreview: Frame for displaying portfolio in different device sizes
+  - ShareTooltip: Interface for sharing portfolio
+  - AnimatedComponents: Motion-enhanced UI elements
 
 ## UI/UX Design
 
 ### Color Palette
-*(To be filled with the primary colors used in the application)*
+- **Primary Colors**: 
+  - Blue (#4a6cf7, #3451b2) - Used for primary actions, buttons and highlights
+  - Orange (#ff7b00, #ff9a00) - Used for accents and secondary highlights
+- **Secondary Colors**:
+  - Dark Text: #24292e, #333, #555
+  - Light Backgrounds: #f8f9ff, #f6f8fa
+  - Border Colors: #e1e4e8, #eee
+- **Gradient Effects**: 
+  - Button gradients: linear-gradient(135deg, #4a6cf7, #3451b2)
+  - Accent gradients: linear-gradient(90deg, #ff7b00, #ffb700)
 
 ### Typography
-*(To be filled with font families and sizes)*
+- **Primary Font**: System font stack with fallbacks to ensure consistency across platforms
+- **Heading Sizes**:
+  - H1: 2.2rem with 800 weight (Landing and main headings)
+  - H2: 1.5rem (Section headings)
+  - H3: 1.2rem (Card headings)
+- **Body Text**: 
+  - Regular: 1rem with 400 weight
+  - Emphasis: 1rem with 600 weight
+- **Special Text**: 
+  - Labels and tags: 0.8rem-0.9rem
 
-### Wireframes
-*(To be filled with screenshots or links to wireframes)*
+### Animations and Interactions
+- **Page Transitions**: Smooth fade-in effects for page changes
+- **Component Animations**: Scale and transform effects on hover for interactive elements
+- **Feedback Animations**: Visual feedback for user actions (button clicks, form submissions)
+- **Loading States**: Animated spinners for asynchronous operations
+- **Hover Effects**: Subtle transform and shadow changes for cards and buttons
 
 ## Technology Stack
 
 ### Frontend
-- React.js
-- React Router
-- Styled Components
+- **React.js**: UI component library
+- **React Router**: Client-side routing
+- **Framer Motion**: Animation library for smooth transitions
+- **CSS Modules/Styled Components**: For component styling
 
 ### State Management
-- React Context API
+- **React Context API**: Global state for portfolio data and GitHub integration
+- **Local Storage**: Persistence of portfolio data between sessions
+
+### External Integrations
+- **GitHub API**: OAuth authentication and repository data fetching
+- **Image Storage**: Unsplash for default project images
 
 ### Future Enhancements
-- User authentication
-- Portfolio templates
-- PDF export
-- Custom domain linking
+- **User Authentication**: Email and password or social login options
+- **Multiple Portfolio Templates**: Different layout and styling options
+- **PDF Export**: Download portfolio as PDF for offline sharing
+- **Custom Domain Linking**: Connect portfolios to personal domains
+- **Analytics Dashboard**: Track portfolio views and engagement
+- **Advanced GitHub Stats**: More detailed coding metrics and visualizations
+- **Project Tagging and Filtering**: Organize projects by category
+- **AI-Powered Content Suggestions**: Smart recommendations for portfolio content
 
 ## Testing
 
 ### Unit Tests
-*(To be filled with testing framework and strategy)*
+- **Testing Framework**: Jest with React Testing Library
+- **Component Testing**: Isolation tests for UI components
+- **State Testing**: Validation of context behavior and state changes
 
 ### Integration Tests
-*(To be filled with testing scenarios)*
+- **User Flow Testing**: End-to-end testing of portfolio creation process
+- **GitHub Integration Testing**: Mock API responses for OAuth flow
+- **Responsive Design Testing**: Validation across multiple device sizes
+- **Cross-Browser Testing**: Compatibility with major browsers
 
 ## Deployment
 
