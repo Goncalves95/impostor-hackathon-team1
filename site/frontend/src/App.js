@@ -16,6 +16,8 @@ import AboutPage from './pages/About';
 import GithubCallback from './components/github/GithubCallback';
 import PrivateRoute from '../src/components/common/PrivateRoute';
 
+import './Global.css';
+
 function App() {
   return (
     <AuthProvider>
