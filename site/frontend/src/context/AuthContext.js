@@ -36,7 +36,6 @@ const demoUser = {
 const predefinedUsers = [
   adminUser,
   demoUser,
-  // Add more demo accounts as needed
 ];
 
 export const AuthProvider = ({ children }) => {
@@ -45,69 +44,96 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [showDevTools, setShowDevTools] = useState(false);
   
-  // Check if we're in dev mode with immediate mock login or production mode with demo login
+  // Automatically use local auth in production if no backend available
+  const [useLocalAuth, setUseLocalAuth] = useState(() => {
+    const saved = localStorage.getItem('useLocalAuth');
+    return saved !== null 
+      ? saved === 'true' 
+      : process.env.NODE_ENV === 'production'; // Default to local auth in production
+  });
+  
+  // For development immediate mock login
   const isDevMode = process.env.NODE_ENV === 'development';
-  const isImmediateMockLogin = isDevMode && localStorage.getItem('useMockAuth') === 'true';
-  const isUsingLocalAuth = !isDevMode || localStorage.getItem('useLocalAuth') === 'true';
+  const isAutoMockEnabled = isDevMode && localStorage.getItem('useMockAuth') === 'true';
+
+  // Detect API availability to switch modes automatically
+  const checkApiAvailability = async () => {
+    try {
+      // Make a simple OPTIONS request to check API availability
+      await axios.options('/api/health-check/');
+      return true;
+    } catch (err) {
+      console.warn('API seems unavailable, using local authentication');
+      return false;
+    }
+  };
 
   useEffect(() => {
-    const checkUserLoggedIn = async () => {
+    const initAuth = async () => {
       try {
-        // For immediate mock login in development
-        if (isImmediateMockLogin) {
-          console.log('🛠️ Using mocked authentication for development');
-          setCurrentUser(predefinedUsers[1]); // Using demo user by default
+        // For automatic mock in development
+        if (isDevMode && isAutoMockEnabled) {
+          console.log('🛠️ Using auto-mocked authentication for development');
+          setCurrentUser(demoUser);
           setLoading(false);
           return;
         }
-
-        // Check if we should try real API or use local auth
-        if (!isUsingLocalAuth) {
+        
+        // First, check if we're in production and if API is available
+        if (process.env.NODE_ENV === 'production') {
+          const apiAvailable = await checkApiAvailability();
+          
+          if (!apiAvailable) {
+            setUseLocalAuth(true);
+            localStorage.setItem('useLocalAuth', 'true');
+          }
+        }
+        
+        // If using real API auth
+        if (!useLocalAuth) {
           const token = localStorage.getItem('token');
           
           if (token) {
-            axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-            
             try {
+              // Set the token in headers
+              axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+              
+              // Try to get user data
               const response = await axios.get('/api/user/');
               setCurrentUser(response.data);
               setLoading(false);
               return;
             } catch (err) {
-              // API failed - fall back to local auth in production
-              if (!isDevMode) {
-                localStorage.setItem('useLocalAuth', 'true');
-                // Continue with local auth flow
-              } else {
-                // In dev, just clear auth and show login screen
-                localStorage.removeItem('token');
-                delete axios.defaults.headers.common['Authorization'];
-                setLoading(false);
-                return;
-              }
+              // If API call fails, switch to local auth in production
+              console.warn('API auth failed, switching to local auth');
+              setUseLocalAuth(true);
+              localStorage.setItem('useLocalAuth', 'true');
+              
+              // Clean up token
+              localStorage.removeItem('token');
+              delete axios.defaults.headers.common['Authorization'];
             }
           }
         }
         
-        // Local authentication flow
-        const localUser = localStorage.getItem('localUser');
-        if (localUser) {
-          setCurrentUser(JSON.parse(localUser));
+        // Local auth flow
+        if (useLocalAuth) {
+          const savedUser = localStorage.getItem('localUser');
+          
+          if (savedUser) {
+            setCurrentUser(JSON.parse(savedUser));
+          }
         }
       } catch (err) {
-        console.error('Authentication error:', err);
-        // Clear any auth tokens
-        localStorage.removeItem('token');
-        localStorage.removeItem('localUser');
-        delete axios.defaults.headers.common['Authorization'];
+        console.error('Auth initialization error:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    checkUserLoggedIn();
+    initAuth();
     
-    // Enable dev tools with secret key combination
+    // Set up dev tools keyboard shortcut
     const handleKeyDown = (e) => {
       // Ctrl + Shift + D to toggle dev tools
       if (e.ctrlKey && e.shiftKey && e.key === 'D') {
@@ -118,33 +144,20 @@ export const AuthProvider = ({ children }) => {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isDevMode, isImmediateMockLogin, isUsingLocalAuth]);
-
-  const toggleMockAuth = () => {
-    if (!isDevMode) return;
-    
-    if (isImmediateMockLogin) {
-      localStorage.removeItem('useMockAuth');
-      setCurrentUser(null);
-    } else {
-      localStorage.setItem('useMockAuth', 'true');
-      setCurrentUser(predefinedUsers[1]); // Using demo user by default
-    }
-  };
+  }, [isDevMode, isAutoMockEnabled, useLocalAuth]);
 
   const login = async (username, password) => {
     try {
-      // Reset previous errors
       setError(null);
       
-      // For development immediate mock
-      if (isDevMode && isImmediateMockLogin) {
-        return predefinedUsers[1]; // Using demo user by default
+      // For development auto-mock
+      if (isDevMode && isAutoMockEnabled) {
+        return demoUser;
       }
       
-      // Try using predefined users for local auth
-      if (isUsingLocalAuth) {
-        // Find matching predefined user
+      // For local auth (or when API is unavailable)
+      if (useLocalAuth) {
+        // First try exact match with predefined users
         const user = predefinedUsers.find(u => 
           (u.username === username || u.email === username) && password === `${username}123`
         );
@@ -153,12 +166,27 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('localUser', JSON.stringify(user));
           setCurrentUser(user);
           return user;
-        } else {
-          throw new Error('Invalid username or password');
         }
+        
+        // If no match with predefined users, check for previously registered local users
+        const localUsers = JSON.parse(localStorage.getItem('localUsers') || '[]');
+        const localUser = localUsers.find(u => 
+          (u.username === username || u.email === username) && u.password === password
+        );
+        
+        if (localUser) {
+          // Remove password before storing in state
+          const { password, ...userWithoutPassword } = localUser;
+          localStorage.setItem('localUser', JSON.stringify(userWithoutPassword));
+          setCurrentUser(userWithoutPassword);
+          return userWithoutPassword;
+        }
+        
+        // No user found
+        throw new Error('Invalid username or password');
       }
       
-      // Try real API
+      // Using real API auth
       try {
         const response = await axios.post('/api/login/', {
           username,
@@ -173,35 +201,47 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(user);
         return user;
       } catch (err) {
-        // If API fails in production, fall back to local auth
-        if (!isDevMode) {
+        // If API call fails with 405 Method Not Allowed or other network error
+        if (err.response?.status === 405 || !err.response) {
+          console.warn('API login failed, switching to local auth');
+          setUseLocalAuth(true);
           localStorage.setItem('useLocalAuth', 'true');
           
-          // Try local auth
+          // Try again with local auth
           return login(username, password);
         }
         
-        throw err;
+        // Other API errors (like invalid credentials)
+        throw new Error(err.response?.data?.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.message);
       throw err;
     }
   };
 
   const register = async (username, email, password) => {
     try {
-      // Reset previous errors
       setError(null);
       
-      // For local auth, just create a new user in localStorage
-      if (isUsingLocalAuth) {
-        // Check if username/email already exists
-        const exists = predefinedUsers.some(u => 
+      // For local auth (or when API is unavailable)
+      if (useLocalAuth) {
+        // Check if username or email already exists in predefined users
+        const predefinedExists = predefinedUsers.some(u => 
           u.username === username || u.email === email
         );
         
-        if (exists) {
+        if (predefinedExists) {
+          throw new Error('Username or email already exists');
+        }
+        
+        // Check if username or email already exists in local users
+        const localUsers = JSON.parse(localStorage.getItem('localUsers') || '[]');
+        const localExists = localUsers.some(u => 
+          u.username === username || u.email === email
+        );
+        
+        if (localExists) {
           throw new Error('Username or email already exists');
         }
         
@@ -210,6 +250,7 @@ export const AuthProvider = ({ children }) => {
           id: `user-${Date.now()}`,
           username,
           email,
+          password, // Store password for local auth only
           first_name: '',
           last_name: '',
           role: 'user',
@@ -219,13 +260,15 @@ export const AuthProvider = ({ children }) => {
           }
         };
         
-        // Store in localStorage
-        localStorage.setItem('localUser', JSON.stringify(newUser));
-        setCurrentUser(newUser);
+        // Add to local users
+        localUsers.push(newUser);
+        localStorage.setItem('localUsers', JSON.stringify(localUsers));
+        
+        // Don't auto-login after registration
         return true;
       }
       
-      // Try real API
+      // Using real API auth
       try {
         await axios.post('/api/register/', {
           username,
@@ -235,50 +278,38 @@ export const AuthProvider = ({ children }) => {
         
         return true;
       } catch (err) {
-        // If API fails in production, fall back to local auth
-        if (!isDevMode) {
+        // If API call fails with 405 Method Not Allowed or other network error
+        if (err.response?.status === 405 || !err.response) {
+          console.warn('API registration failed, switching to local auth');
+          setUseLocalAuth(true);
           localStorage.setItem('useLocalAuth', 'true');
           
-          // Try local auth
+          // Try again with local auth
           return register(username, email, password);
         }
         
-        throw err;
+        // Other API errors (like validation errors)
+        throw new Error(err.response?.data?.message || 'Registration failed. Please try again.');
       }
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message);
       throw err;
     }
   };
 
-  const logout = async () => {
-    try {
-      // For local auth, just remove from localStorage
-      if (isUsingLocalAuth) {
-        localStorage.removeItem('localUser');
-        setCurrentUser(null);
-        return;
-      }
-      
-      // Try real API
-      try {
-        await axios.post('/api/logout/');
-      } catch (err) {
-        // Ignore error, proceed with logout
-        console.warn('Logout API error (continuing):', err);
-      }
-      
-      // Clean up regardless of API success
-      localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
-      setCurrentUser(null);
-    } catch (err) {
-      console.error('Logout error:', err);
-      // Force logout on any error
-      localStorage.removeItem('token');
-      localStorage.removeItem('localUser');
-      delete axios.defaults.headers.common['Authorization'];
-      setCurrentUser(null);
+  const logout = () => {
+    // Clear authentication data regardless of mode
+    localStorage.removeItem('token');
+    localStorage.removeItem('localUser');
+    delete axios.defaults.headers.common['Authorization'];
+    setCurrentUser(null);
+    
+    // Don't try API logout if using local auth
+    if (!useLocalAuth) {
+      // Try API logout but don't wait for it or handle errors
+      axios.post('/api/logout/').catch(() => {
+        // Silent catch - we don't care if this fails
+      });
     }
   };
 
@@ -294,7 +325,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isAdmin,
-    isDevelopment: isDevMode
+    isUsingLocalAuth: useLocalAuth
   };
 
   return (
@@ -320,7 +351,10 @@ export const AuthProvider = ({ children }) => {
             Status: {currentUser ? '✅ Authenticated' : '❌ Not Authenticated'}
           </div>
           <div style={{ marginBottom: '8px' }}>
-            Mode: {isUsingLocalAuth ? '🔒 Local Auth' : '🌐 API Auth'}
+            Mode: {useLocalAuth ? '🔒 Local Auth' : '🌐 API Auth'}
+          </div>
+          <div style={{ marginBottom: '8px' }}>
+            Environment: {process.env.NODE_ENV}
           </div>
           <div style={{ marginBottom: '8px' }}>
             User: {currentUser?.username || 'None'}
@@ -331,9 +365,13 @@ export const AuthProvider = ({ children }) => {
           
           {isDevMode && (
             <button 
-              onClick={toggleMockAuth}
+              onClick={() => {
+                const current = localStorage.getItem('useMockAuth') === 'true';
+                localStorage.setItem('useMockAuth', current ? 'false' : 'true');
+                window.location.reload();
+              }}
               style={{
-                backgroundColor: isImmediateMockLogin ? '#e74c3c' : '#2ecc71',
+                backgroundColor: isAutoMockEnabled ? '#e74c3c' : '#2ecc71',
                 color: 'white',
                 border: 'none',
                 padding: '5px 10px',
@@ -343,13 +381,14 @@ export const AuthProvider = ({ children }) => {
                 marginBottom: '8px'
               }}
             >
-              {isImmediateMockLogin ? 'Disable Auto-Mock' : 'Enable Auto-Mock'}
+              {isAutoMockEnabled ? 'Disable Auto-Mock' : 'Enable Auto-Mock'}
             </button>
           )}
           
           <button 
             onClick={() => {
-              localStorage.setItem('useLocalAuth', isUsingLocalAuth ? 'false' : 'true');
+              setUseLocalAuth(!useLocalAuth);
+              localStorage.setItem('useLocalAuth', !useLocalAuth ? 'true' : 'false');
               window.location.reload();
             }}
             style={{
@@ -362,7 +401,7 @@ export const AuthProvider = ({ children }) => {
               width: '100%'
             }}
           >
-            {isUsingLocalAuth ? 'Try API Auth' : 'Use Local Auth'}
+            {useLocalAuth ? 'Try API Auth' : 'Use Local Auth'}
           </button>
         </div>
       )}
