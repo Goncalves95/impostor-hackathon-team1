@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext';
-import { useAuth } from '../context/AuthContext'; // Importe o contexto de autenticação
+import { useAuth } from '../context/AuthContext'; 
 import BioSection from '../components/portfolio/BioSection';
 import ProjectsSection from '../components/portfolio/ProjectSection';
 import SkillsSection from '../components/portfolio/SkillsSection';
@@ -10,13 +10,12 @@ import '../styles/Preview.css';
 
 function Preview() {
   const { portfolioData } = usePortfolio();
-  const { currentUser } = useAuth(); // Obtenha o usuário atual
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [shareTooltip, setShareTooltip] = useState(false);
   const [activeTab, setActiveTab] = useState('bio');
   const [previewMode, setPreviewMode] = useState('desktop');
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -53,7 +52,6 @@ function Preview() {
   };
 
   const copyLink = () => {
-    // In a real app, this would be a unique link to the portfolio
     const username = portfolioData.bio.name || currentUser?.username || 'yourportfolio';
     navigator.clipboard.writeText(`https://leveluphub.com/portfolio/${username.toLowerCase().replace(' ', '')}`);
     alert('Portfolio link copied to clipboard!');
@@ -254,7 +252,6 @@ function Preview() {
                         src={mergedPortfolioData.bio.avatar} 
                         alt={mergedPortfolioData.bio.name} 
                         onError={(e) => {
-                          // Se a imagem falhar, use uma imagem de fallback
                           e.target.src = "https://images.unsplash.com/photo-1561037404-61cd46aa615b?q=80&w=300&auto=format";
                         }}
                       />
