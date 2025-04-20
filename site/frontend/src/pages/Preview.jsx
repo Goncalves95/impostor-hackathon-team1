@@ -63,10 +63,8 @@ function Preview() {
     setPreviewMode(mode);
   };
 
-  // Usando dados do usuário de demonstração ou do portfolioData se existir
   const mergedPortfolioData = {
     bio: {
-      // Se o bio do portfolioData existe e tem dados, use-os, caso contrário use valores padrão
       name: portfolioData.bio?.name || currentUser?.first_name + ' ' + currentUser?.last_name || "Alex Morgan",
       title: portfolioData.bio?.title || currentUser?.profile?.bio || "Full Stack Developer",
       location: portfolioData.bio?.location || "San Francisco, CA",
