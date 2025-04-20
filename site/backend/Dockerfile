@@ -48,4 +48,4 @@ USER appuser
 EXPOSE 8000 
  
 # Start the application using Gunicorn
-CMD ["gunicorn", "portfolio.wsgi"]
+CMD ["gunicorn", "portfolio.wsgi:application"]
