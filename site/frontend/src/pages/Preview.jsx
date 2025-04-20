@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext';
+import { useAuth } from '../context/AuthContext'; // Importe o contexto de autenticação
 import BioSection from '../components/portfolio/BioSection';
 import ProjectsSection from '../components/portfolio/ProjectSection';
 import SkillsSection from '../components/portfolio/SkillsSection';
@@ -9,6 +10,7 @@ import '../styles/Preview.css';
 
 function Preview() {
   const { portfolioData } = usePortfolio();
+  const { currentUser } = useAuth(); // Obtenha o usuário atual
   const navigate = useNavigate();
   const [shareTooltip, setShareTooltip] = useState(false);
   const [activeTab, setActiveTab] = useState('bio');
@@ -52,7 +54,8 @@ function Preview() {
 
   const copyLink = () => {
     // In a real app, this would be a unique link to the portfolio
-    navigator.clipboard.writeText('https://leveluphub.com/portfolio/yourportfolio');
+    const username = portfolioData.bio.name || currentUser?.username || 'yourportfolio';
+    navigator.clipboard.writeText(`https://leveluphub.com/portfolio/${username.toLowerCase().replace(' ', '')}`);
     alert('Portfolio link copied to clipboard!');
   };
 
@@ -60,18 +63,19 @@ function Preview() {
     setPreviewMode(mode);
   };
 
-  // Mock data for demonstration purposes - in real app would come from portfolioData
-  const portfolioMockData = {
-    bio: portfolioData.bio || {
-      name: "Alex Morgan",
-      title: "Full Stack Developer",
-      location: "San Francisco, CA",
-      about: "Passionate developer with 5+ years of experience building web applications. Specialized in React, Node.js, and cloud infrastructure.",
-      email: "alex@example.com",
-      linkedin: "linkedin.com/in/alexmorgan",
-      github: "github.com/alexmorgan",
-      website: "alexmorgan.dev",
-      avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=300&auto=format"
+  // Usando dados do usuário de demonstração ou do portfolioData se existir
+  const mergedPortfolioData = {
+    bio: {
+      // Se o bio do portfolioData existe e tem dados, use-os, caso contrário use valores padrão
+      name: portfolioData.bio?.name || currentUser?.first_name + ' ' + currentUser?.last_name || "Alex Morgan",
+      title: portfolioData.bio?.title || currentUser?.profile?.bio || "Full Stack Developer",
+      location: portfolioData.bio?.location || "San Francisco, CA",
+      about: portfolioData.bio?.about || currentUser?.profile?.bio || "Passionate developer with 5+ years of experience building web applications. Specialized in React, Node.js, and cloud infrastructure.",
+      email: portfolioData.bio?.email || currentUser?.email || "alex@example.com",
+      linkedin: portfolioData.bio?.linkedin || "linkedin.com/in/alexmorgan",
+      github: portfolioData.bio?.github || currentUser?.username && `github.com/${currentUser.username}` || "github.com/alexmorgan",
+      website: portfolioData.bio?.website || "alexmorgan.dev",
+      avatar: portfolioData.bio?.avatar || currentUser?.profile?.avatar || "https://images.unsplash.com/photo-1561037404-61cd46aa615b?q=80&w=300&auto=format"
     },
     projects: portfolioData.projects.length > 0 ? portfolioData.projects : [
       {
@@ -204,7 +208,7 @@ function Preview() {
               <span className="browser-dot green"></span>
             </div>
             <div className="browser-address">
-              <span>portfolio.leveluphub.com/{portfolioMockData.bio.name.toLowerCase().replace(' ', '')}</span>
+              <span>portfolio.leveluphub.com/{mergedPortfolioData.bio.name.toLowerCase().replace(' ', '')}</span>
             </div>
           </div>
           
@@ -248,18 +252,25 @@ function Preview() {
                 <div className="tab-bio">
                   <div className="bio-header">
                     <div className="bio-avatar">
-                      <img src={portfolioMockData.bio.avatar} alt={portfolioMockData.bio.name} />
+                      <img 
+                        src={mergedPortfolioData.bio.avatar} 
+                        alt={mergedPortfolioData.bio.name} 
+                        onError={(e) => {
+                          // Se a imagem falhar, use uma imagem de fallback
+                          e.target.src = "https://images.unsplash.com/photo-1561037404-61cd46aa615b?q=80&w=300&auto=format";
+                        }}
+                      />
                     </div>
                     <div className="bio-intro">
-                      <h1>{portfolioMockData.bio.name}</h1>
-                      <h2>{portfolioMockData.bio.title}</h2>
-                      <p className="bio-location">📍 {portfolioMockData.bio.location}</p>
+                      <h1>{mergedPortfolioData.bio.name}</h1>
+                      <h2>{mergedPortfolioData.bio.title}</h2>
+                      <p className="bio-location">📍 {mergedPortfolioData.bio.location}</p>
                     </div>
                   </div>
                   
                   <div className="bio-about">
                     <h3>About Me</h3>
-                    <p>{portfolioMockData.bio.about}</p>
+                    <p>{mergedPortfolioData.bio.about}</p>
                     
                     <div className="bio-highlight">
                       <p>I specialize in creating user-friendly web applications that solve real-world problems. My background in both frontend and backend development allows me to build complete solutions with clean code and intuitive designs.</p>
@@ -272,7 +283,7 @@ function Preview() {
                 <div className="tab-projects">
                   <h3>My Projects</h3>
                   <div className="projects-grid">
-                    {portfolioMockData.projects.map(project => (
+                    {mergedPortfolioData.projects.map(project => (
                       <div className="project-card" key={project.id}>
                         <div className="project-image" style={{backgroundImage: `url(${project.image})`}}>
                           <div className="project-overlay">
@@ -298,7 +309,7 @@ function Preview() {
                 <div className="tab-skills">
                   <h3>Technical Skills</h3>
                   <div className="skills-container">
-                    {portfolioMockData.skills.map((skill, index) => (
+                    {mergedPortfolioData.skills.map((skill, index) => (
                       <div className="skill-item" key={index}>
                         <div className="skill-info">
                           <span className="skill-name">{skill.name}</span>
@@ -334,7 +345,7 @@ function Preview() {
                         <div className="contact-icon">✉️</div>
                         <div className="contact-info">
                           <h4>Email</h4>
-                          <a href={`mailto:${portfolioMockData.bio.email}`}>{portfolioMockData.bio.email}</a>
+                          <a href={`mailto:${mergedPortfolioData.bio.email}`}>{mergedPortfolioData.bio.email}</a>
                         </div>
                       </div>
                       
@@ -342,7 +353,7 @@ function Preview() {
                         <div className="contact-icon">🔗</div>
                         <div className="contact-info">
                           <h4>LinkedIn</h4>
-                          <a href={`https://${portfolioMockData.bio.linkedin}`}  rel="noreferrer">{portfolioMockData.bio.linkedin}</a>
+                          <a href={`https://${mergedPortfolioData.bio.linkedin}`}  rel="noreferrer">{mergedPortfolioData.bio.linkedin}</a>
                         </div>
                       </div>
                       
@@ -350,7 +361,7 @@ function Preview() {
                         <div className="contact-icon">💻</div>
                         <div className="contact-info">
                           <h4>GitHub</h4>
-                          <a href={`https://${portfolioMockData.bio.github}`}  rel="noreferrer">{portfolioMockData.bio.github}</a>
+                          <a href={`https://${mergedPortfolioData.bio.github}`}  rel="noreferrer">{mergedPortfolioData.bio.github}</a>
                         </div>
                       </div>
                       
@@ -358,7 +369,7 @@ function Preview() {
                         <div className="contact-icon">🌐</div>
                         <div className="contact-info">
                           <h4>Website</h4>
-                          <a href={`https://${portfolioMockData.bio.website}`}  rel="noreferrer">{portfolioMockData.bio.website}</a>
+                          <a href={`https://${mergedPortfolioData.bio.website}`}  rel="noreferrer">{mergedPortfolioData.bio.website}</a>
                         </div>
                       </div>
                     </div>
