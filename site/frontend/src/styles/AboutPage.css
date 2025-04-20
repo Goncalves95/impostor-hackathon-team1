@@ -255,6 +255,8 @@
   flex: 1;
   min-width: 300px;
   max-width: 500px;
+  max-height: 500px;
+  min-height: 300px;
   margin: 0 auto;
 }
 
@@ -272,6 +274,7 @@
 }
 
 .project-image {
+  height: auto;
   width: 100%;
   display: block;
   border-radius: 10px;
