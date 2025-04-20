@@ -1,121 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import BioForm from '../components/forms/BioForm';
 import ProjectForm from '../components/forms/PreojectForm';
 import SkillsForm from '../components/forms/SkillForm';
 import GithubConnect from '../components/github/GithubConnect';
 import GithubImport from '../components/github/GithubImport';
 import { usePortfolio } from '../context/PortfolioContext';
-
-const BuilderContainer = styled.div`
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-`;
-
-const StepIndicator = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-`;
-
-const Step = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const StepNumber = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${props => props.active ? '#4a6cf7' : '#e0e0e0'};
-  color: ${props => props.active ? 'white' : '#666'};
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-`;
-
-const StepText = styled.div`
-  font-size: 0.9rem;
-  color: ${props => props.active ? '#4a6cf7' : '#666'};
-`;
-
-const StepConnector = styled.div`
-  flex-grow: 1;
-  height: 2px;
-  background-color: #e0e0e0;
-  margin: 20px 10px;
-`;
-
-const FormContainer = styled.div`
-  background-color: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
-`;
-
-const Button = styled.button`
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s, transform 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    background-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const BackButton = styled(Button)`
-  background-color: #f0f0f0;
-  color: #333;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
-const NextButton = styled(Button)`
-  background-color: #4a6cf7;
-  color: white;
-
-  &:hover {
-    background-color: #3451b2;
-  }
-`;
-
-const SectionDivider = styled.div`
-  height: 1px;
-  background-color: #e0e0e0;
-  margin: 2rem 0;
-`;
+import '../styles/Builder.css';
 
 function Builder() {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
   const { portfolioData, savePortfolio } = usePortfolio();
 
+  // Função para determinar a classe do número do passo
+  const getStepNumberClass = (step) => {
+    if (step < currentStep) return 'step-number completed';
+    if (step === currentStep) return 'step-number active';
+    return 'step-number inactive';
+  };
+
+  // Função para determinar a classe do texto do passo
+  const getStepTextClass = (step) => {
+    if (step < currentStep) return 'step-text completed';
+    if (step === currentStep) return 'step-text active';
+    return 'step-text inactive';
+  };
+
+  // Função para determinar a classe do conector
+  const getConnectorClass = (index) => {
+    if (currentStep > index + 1) return 'step-connector-progress full';
+    if (currentStep === index + 1) return 'step-connector-progress half';
+    return '';
+  };
+
   const handleNext = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       handleFinish();
     }
@@ -124,6 +47,8 @@ function Builder() {
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -138,31 +63,51 @@ function Builder() {
   };
 
   return (
-    <BuilderContainer>
-      <StepIndicator>
-        <Step>
-          <StepNumber active={currentStep >= 1}>1</StepNumber>
-          <StepText active={currentStep >= 1}>Personal Information</StepText>
-        </Step>
-        <StepConnector />
-        <Step>
-          <StepNumber active={currentStep >= 2}>2</StepNumber>
-          <StepText active={currentStep >= 2}>Projects</StepText>
-        </Step>
-        <StepConnector />
-        <Step>
-          <StepNumber active={currentStep >= 3}>3</StepNumber>
-          <StepText active={currentStep >= 3}>Skills</StepText>
-        </Step>
-      </StepIndicator>
+    <div className="builder-container">
+      {/* Background elements */}
+      <div className="builder-bg-elements">
+        <div className="builder-bg-circle circle-1"></div>
+        <div className="builder-bg-circle circle-2"></div>
+        <div className="builder-bg-grid"></div>
+      </div>
 
-      <FormContainer>
+      {/* Step indicator */}
+      <div className="step-indicator">
+        <div className="step">
+          <div className={getStepNumberClass(1)}>1</div>
+          <div className={getStepTextClass(1)}>Personal Information</div>
+        </div>
+        
+        <div className="step-connector">
+          <div className={getConnectorClass(1)}></div>
+        </div>
+        
+        <div className="step">
+          <div className={getStepNumberClass(2)}>2</div>
+          <div className={getStepTextClass(2)}>Projects</div>
+        </div>
+        
+        <div className="step-connector">
+          <div className={getConnectorClass(2)}></div>
+        </div>
+        
+        <div className="step">
+          <div className={getStepNumberClass(3)}>3</div>
+          <div className={getStepTextClass(3)}>Skills</div>
+        </div>
+      </div>
+
+      {/* Form container */}
+      <div className="form-container">
         {currentStep === 1 && (
           <>
             <BioForm />
-            <SectionDivider />
-            <GithubConnect isConnected={portfolioData.github.connected} />
-            {portfolioData.github.connected && <GithubImport />}
+            <div className="section-divider"></div>
+            <div className="github-section">
+              <h3 className="section-header">GitHub Connection</h3>
+              <GithubConnect isConnected={portfolioData.github.connected} />
+              {portfolioData.github.connected && <GithubImport />}
+            </div>
           </>
         )}
         
@@ -171,9 +116,11 @@ function Builder() {
             <ProjectForm />
             {portfolioData.github.connected && portfolioData.github.repos.length > 0 && (
               <>
-                <SectionDivider />
-                <h3>GitHub Repositories</h3>
-                <p>You can import your GitHub repositories as projects using the GitHub tab in step 1.</p>
+                <div className="section-divider"></div>
+                <div className="github-section">
+                  <h3 className="section-header">GitHub Repositories</h3>
+                  <p>You can import your GitHub repositories as projects using the GitHub tab in step 1.</p>
+                </div>
               </>
             )}
           </>
@@ -184,27 +131,30 @@ function Builder() {
             <SkillsForm />
             {portfolioData.github.connected && portfolioData.github.languages.length > 0 && (
               <>
-                <SectionDivider />
-                <h3>GitHub Languages</h3>
-                <p>You can import your GitHub programming languages as skills using the GitHub tab in step 1.</p>
+                <div className="section-divider"></div>
+                <div className="github-section">
+                  <h3 className="section-header">GitHub Languages</h3>
+                  <p>You can import your GitHub programming languages as skills using the GitHub tab in step 1.</p>
+                </div>
               </>
             )}
           </>
         )}
 
-        <ButtonsContainer>
-          <BackButton 
+        <div className="buttons-container">
+          <button 
+            className="builder-button back-button" 
             onClick={handleBack} 
             disabled={currentStep === 1}
           >
             Back
-          </BackButton>
-          <NextButton onClick={handleNext}>
+          </button>
+          <button className="builder-button next-button" onClick={handleNext}>
             {currentStep === 3 ? 'Finish' : 'Next'}
-          </NextButton>
-        </ButtonsContainer>
-      </FormContainer>
-    </BuilderContainer>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

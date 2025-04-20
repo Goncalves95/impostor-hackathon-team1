@@ -24,12 +24,12 @@ const AboutPage = () => {
 
   const teamMembers = [
     {
-      name: "Team Member 1",
+      name: "Alita Pantea",
       role: "Full Stack Developer",
-      bio: "Brief professional description with experience and core competencies. Focus on web development with React and Node.js.",
-      image: "",
-      linkedin: "https://linkedin.com/in/member1",
-      github: "https://github.com/member1"
+      bio: "Every role I’ve held has shaped the way I approach challenges, and I continue to embrace new opportunities to grow both personally and professionally.",
+      image: "/images/team/alita.jpg",
+      linkedin: "https://www.linkedin.com/in/alita-pantea/",
+      github: "https://github.com/hashtag-squirrel"
     },
     {
       name: "Fernando Gonçalves",
@@ -41,11 +41,11 @@ const AboutPage = () => {
     },
     {
       name: "Team Member 3",
-      role: "Backend Developer",
-      bio: "Backend developer with experience in RESTful APIs, databases, and infrastructure. Specialized in Python and Django.",
-      image: "/images/team/member3.jpg",
-      linkedin: "https://linkedin.com/in/member3",
-      github: "https://github.com/member3"
+      role: "Junior Software Developer",
+      bio: "I’m passionate about bringing creative, efficient solutions to life through code. Skilled in HTML, CSS, JavaScript, Python, and React.",
+      image: "/images/team/pati.jpeg",
+      linkedin: "https://www.linkedin.com/in/patriciarlacerda/",
+      github: "https://github.com/patilacerda"
     }
   ];
 
