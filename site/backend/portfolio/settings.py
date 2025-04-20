@@ -65,7 +65,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "https://level-up-hub.vercel.app",
+    "https://leveluphub.vercel.app",
     "http://localhost:3000",
 ]
 
