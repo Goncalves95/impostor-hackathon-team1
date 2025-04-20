@@ -94,6 +94,7 @@ export const MOCK_GITHUB_DATA = {
       forks_count: 2,
       updated_at: '2023-09-25T11:32:45Z',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1770&auto=format&fit=crop'
+    },
     {
       id: 8,
       name: 'fitness-tracker',

@@ -267,9 +267,10 @@ export const PortfolioProvider = ({ children }) => {
       description: repo.description || `A repository on GitHub called ${repo.name}`,
       technologies: [repo.language].filter(Boolean),
       link: repo.html_url,
-      image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?q=80&w=2076&auto=format&fit=crop"
+      image: repo.image || 
+             `https://images.unsplash.com/photo-1556075798-4825dfaaf498?q=80&w=2076&auto=format&fit=crop`
     }));
-
+  
     setPortfolioData(prev => ({
       ...prev,
       projects: [...prev.projects, ...newProjects]
