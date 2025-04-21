@@ -1,6 +1,6 @@
 # Level Up Hub
 
-![logo](site\frontend\public\images\readme\RD_logo.png)
+![logo](site/frontend/public/images/readme/RD_logo.png)
 
 ## Overview
 
