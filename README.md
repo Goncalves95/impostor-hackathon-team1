@@ -45,7 +45,52 @@ Level Up Hub is a simple, fast, and effective web application that allows users 
 
 ## UI/UX Design
 
+### Wireframes
+
+The original wireframes were created to visualize the overall structure and layout of LevelUpHub before the UI was implemented. They helped us understand how users would interact with the site and how we could organize key features in an intuitive and supportive way.
+
+<details>
+  <summary>Wireframe 1 – Landing Page</summary>
+  <img src="site\frontend\public\images\readme\Landing.png" alt="Landing page wireframe">
+</details>
+
+<details>
+  <summary>Wireframe 2 – User Profile</summary>
+  <img src="site\frontend\public\images\readme\Profile.png" alt="User profile wireframe">
+</details>
+
+<details>
+  <summary>Wireframe 3 – Project Page</summary>
+  <img src="site\frontend\public\images\readme\Project Detail.png" alt="Project page wireframe">
+</details>
+
 ### Color Palette
+
+We explored different color palette combinations to find one that felt vibrant, friendly, and encouraging.
+
+Here are some of the combinations we tried during the design process:
+
+<details>
+  <summary>Color Option 1</summary>
+  <img src="site\frontend\public\images\readme\blacklogo.png" alt="Color option 1">
+</details>
+
+<details>
+  <summary>Color Option 2</summary>
+  <img src="site\frontend\public\images\readme\blue_blacklogo.png" alt="Color option 2">
+
+</details>
+
+<details>
+  <summary>Color Option 3</summary>
+  <img src="site\frontend\public\images\readme\RO_blacklogo.png" alt="Color option 3">
+</details>
+
+<details>
+  <summary>Final Color Palette</summary>
+  <img src="site\frontend\public\images\readme\RD_logo.png" alt="Final color palette">
+</details>
+
 - **Primary Colors**: 
   - Blue (#4a6cf7, #3451b2) - Used for primary actions, buttons and highlights
   - Orange (#ff7b00, #ff9a00) - Used for accents and secondary highlights
@@ -75,52 +120,6 @@ Level Up Hub is a simple, fast, and effective web application that allows users 
 - **Feedback Animations**: Visual feedback for user actions (button clicks, form submissions)
 - **Loading States**: Animated spinners for asynchronous operations
 - **Hover Effects**: Subtle transform and shadow changes for cards and buttons
-
-## Wireframes
-
-The original wireframes were created to visualize the overall structure and layout of LevelUpHub before the UI was implemented. They helped us understand how users would interact with the site and how we could organize key features in an intuitive and supportive way.
-
-<details>
-  <summary>Wireframe 1 – Landing Page</summary>
-  <img src="site\frontend\public\images\readme\Landing.png" alt="Landing page wireframe">
-</details>
-
-<details>
-  <summary>Wireframe 2 – User Profile</summary>
-  <img src="site\frontend\public\images\readme\Profile.png" alt="User profile wireframe">
-</details>
-
-<details>
-  <summary>Wireframe 3 – Project Page</summary>
-  <img src="site\frontend\public\images\readme\Project Detail.png" alt="Project page wireframe">
-</details>
-
-## Color Palette Exploration
-
-We explored different color palette combinations to find one that felt vibrant, friendly, and encouraging.
-
-Here are some of the combinations we tried during the design process:
-
-<details>
-  <summary>Color Option 1</summary>
-  <img src="site\frontend\public\images\readme\blacklogo.png" alt="Color option 1">
-</details>
-
-<details>
-  <summary>Color Option 2</summary>
-  <img src="site\frontend\public\images\readme\blue_blacklogo.png" alt="Color option 2">
-  
-</details>
-
-<details>
-  <summary>Color Option 3</summary>
-  <img src="site\frontend\public\images\readme\RO_blacklogo.png" alt="Color option 3">
-</details>
-
-<details>
-  <summary>Final Color Palette</summary>
-  <img src="site\frontend\public\images\readme\RD_logo.png" alt="Final color palette">
-</details>
 
 ## Technology Stack
 
