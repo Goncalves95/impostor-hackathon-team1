@@ -1,6 +1,9 @@
 # Level Up Hub
 
+![logo](site\frontend\public\images\readme\RD_logo.png)
+
 ## Overview
+
 Level Up Hub is a simple, fast, and effective web application that allows users to create professional portfolios in minutes. This React-based tool helps users showcase their personal information, projects, and skills in a clean, attractive format with modern design elements and seamless social integrations.
 
 ## Features
@@ -17,7 +20,7 @@ Level Up Hub is a simple, fast, and effective web application that allows users 
 
 ### Pages
 - **Home**: Landing page with feature highlights and value proposition
-- **Builder**: Step-by-step portfolio creation with integrated GitHub connectivity
+- **Builder**: Step-by-step portfolio creation including GitHub connectivity integration 
 - **Preview**: Live preview of the created portfolio with different device views
 - **GitHub Callback**: Handler for OAuth authentication with GitHub
 
@@ -73,6 +76,52 @@ Level Up Hub is a simple, fast, and effective web application that allows users 
 - **Loading States**: Animated spinners for asynchronous operations
 - **Hover Effects**: Subtle transform and shadow changes for cards and buttons
 
+## Wireframes
+
+The original wireframes were created to visualize the overall structure and layout of LevelUpHub before the UI was implemented. They helped us understand how users would interact with the site and how we could organize key features in an intuitive and supportive way.
+
+<details>
+  <summary>Wireframe 1 – Landing Page</summary>
+  <img src="site\frontend\public\images\readme\Landing.png" alt="Landing page wireframe">
+</details>
+
+<details>
+  <summary>Wireframe 2 – User Profile</summary>
+  <img src="site\frontend\public\images\readme\Profile.png" alt="User profile wireframe">
+</details>
+
+<details>
+  <summary>Wireframe 3 – Project Page</summary>
+  <img src="site\frontend\public\images\readme\Project Detail.png" alt="Project page wireframe">
+</details>
+
+## Color Palette Exploration
+
+We explored different color palette combinations to find one that felt vibrant, friendly, and encouraging.
+
+Here are some of the combinations we tried during the design process:
+
+<details>
+  <summary>Color Option 1</summary>
+  <img src="site\frontend\public\images\readme\blacklogo.png" alt="Color option 1">
+</details>
+
+<details>
+  <summary>Color Option 2</summary>
+  <img src="site\frontend\public\images\readme\blue_blacklogo.png" alt="Color option 2">
+  
+</details>
+
+<details>
+  <summary>Color Option 3</summary>
+  <img src="site\frontend\public\images\readme\RO_blacklogo.png" alt="Color option 3">
+</details>
+
+<details>
+  <summary>Final Color Palette</summary>
+  <img src="site\frontend\public\images\readme\RD_logo.png" alt="Final color palette">
+</details>
+
 ## Technology Stack
 
 ### Frontend
@@ -123,7 +172,7 @@ To run the Docker container for development, follow these steps:
 3. Navigate to the `site` folder (`cd site`)
 4. Run `docker-compose build` to build the image
 5. Run `docker-compose up` to run the site on localhost:3000
-6. Instead of 4 and 5, you can also run `docker-compose up --build` to combine the steps
+6. Alternatively, run `docker-compose up --build` to combine the steps
 
 ### Hosting
 
@@ -148,3 +197,5 @@ Level Up Hub was created by the team **The Last of Us** during the Code Institut
 - [Fernando](https://github.com/Goncalves95)
 - [Patricia](https://github.com/patilacerda)
 - [Alita](https://github.com/hashtag-squirrel)
+ 
+ 
