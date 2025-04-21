@@ -161,6 +161,9 @@ Here are some of the combinations we tried during the design process:
 - **Responsive Design Testing**: Validation across multiple device sizes
 - **Cross-Browser Testing**: Compatibility with major browsers
 
+### Known bugs
+- **Local Docker deployment**: Sometimes there is an issue with Docker not recognizing the react scripts. A workaround to this is to run a virtual environment and install node packages locally before running `docker-compose`. 
+
 ## Deployment
 
 ### Development
