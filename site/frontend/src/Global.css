@@ -11,6 +11,8 @@ body {
   background-image: '/images/site/6900.jpg';
   color: #333;
   line-height: 1.5;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 main {
@@ -44,4 +46,11 @@ input, textarea, select {
   flex: 1;
   padding-top: 80px;
   padding-bottom: 80px;
+}
+
+@media  (max-width: 768px) {
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
