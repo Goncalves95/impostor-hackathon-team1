@@ -126,14 +126,25 @@ To run the Docker container for development, follow these steps:
 6. Instead of 4 and 5, you can also run `docker-compose up --build` to combine the steps
 
 ### Hosting
-*(To be filled with hosting information)*
+
+#### Frontend
+
+The React frontend is hosted on [Vercel](https://vercel.com/) and is deployed using their framework preset for React apps.
+
+#### Backend
+
+The Django backend is hosted on [Render](https://render.com/).
+
+The backend is deployed using the Dockerfile in the backend folder of the repository. 
 
 ### CI/CD Pipeline
-*(To be filled with continuous integration/deployment details)*
+
+Both front- and backend are automatically redeployed when a branch is merged into the main branch of the git repository. 
 
 ## Contributing
 
+Level Up Hub was created by the team **The Last of Us** during the Code Institute April 2025 Hackathon with the theme "Unmask the Coder: Beating Impostor Syndrome One Line at a Time". 
 
-## Acknowledgements
-- Developed during a Hackathon event
-- Inspired by the need for simple portfolio tools for developers
+- [Fernando](https://github.com/Goncalves95)
+- [Patricia](https://github.com/patilacerda)
+- [Alita](https://github.com/hashtag-squirrel)
