@@ -90,6 +90,7 @@ Level Up Hub is a simple, fast, and effective web application that allows users 
 - **Image Storage**: Unsplash for default project images
 
 ### Future Enhancements
+- **Django**: The implementation of Django for the backend was started, but not finished due to time constraints
 - **User Authentication**: Email and password or social login options
 - **Multiple Portfolio Templates**: Different layout and styling options
 - **PDF Export**: Download portfolio as PDF for offline sharing
