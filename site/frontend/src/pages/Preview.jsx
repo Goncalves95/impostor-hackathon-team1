@@ -9,12 +9,13 @@ import SkillsSection from '../components/portfolio/SkillsSection';
 import '../styles/Preview.css';
 
 function Preview() {
-  const { portfolioData } = usePortfolio();
+  const { portfolioData, fetchPortfolio } = usePortfolio();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [shareTooltip, setShareTooltip] = useState(false);
   const [activeTab, setActiveTab] = useState('bio');
   const [previewMode, setPreviewMode] = useState('desktop');
+  const [isLoading, setIsLoading] = useState(true);
 
   const containerVariants = {
     hidden: { opacity: 0 },
