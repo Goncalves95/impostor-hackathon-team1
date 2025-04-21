@@ -1,4 +1,3 @@
-
 .home-container {
   max-width: 1800px;
   margin: 0 auto;
@@ -29,7 +28,7 @@
   background-color: rgba(255, 123, 0, 0.15);
   top: 20%;
   left: -100px;
-  animation: float 12s ease-in-out infinite alternate;
+  animation: float-element 12s ease-in-out infinite alternate;
 }
 
 .shadow-element {
@@ -38,7 +37,7 @@
   background-color: rgba(74, 108, 247, 0.1);
   bottom: 10%;
   right: -150px;
-  animation: float 15s ease-in-out infinite alternate-reverse;
+  animation: float-element 15s ease-in-out infinite alternate-reverse;
 }
 
 .light-element {
@@ -47,10 +46,10 @@
   background-color: rgba(255, 183, 0, 0.15);
   top: 70%;
   left: 30%;
-  animation: float 10s ease-in-out infinite alternate;
+  animation: float-element 10s ease-in-out infinite alternate;
 }
 
-@keyframes float {
+@keyframes float-element {
   0% {
     transform: translateY(0) scale(1);
   }
@@ -193,63 +192,51 @@
 .hero-visual {
   flex: 1;
   min-width: 300px;
-  max-width: 800px;
+  max-width: 600px;
   display: flex;
   justify-content: center;
-}
-
-.impostor-illustration {
-  width: 300px;
-  height: 300px;
-  border-radius: 20px;
-  overflow: hidden;
+  align-items: center;
   position: relative;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-  transform: perspective(800px) rotateY(-15deg);
-  transition: transform 0.5s;
 }
 
-.impostor-illustration:hover {
-  transform: perspective(800px) rotateY(0deg);
+.landing-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
+  animation: float 6s ease-in-out infinite;
+  z-index: 5;
 }
 
-.mask {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('https://images.unsplash.com/photo-1561037404-61cd46aa615b?q=80&w=300&auto=format') center/cover;
-  animation: revealMask 7s infinite alternate;
-  opacity: 0.7;
-}
-
-.real-face {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=300&auto=format') center/cover;
-  animation: revealFace 7s infinite alternate;
-}
-
-@keyframes revealMask {
+@keyframes float {
   0% {
-    opacity: 0.8;
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
   }
   100% {
-    opacity: 0;
+    transform: translateY(0);
   }
 }
 
-@keyframes revealFace {
-  0% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 1;
-  }
+.hero-visual::after {
+  content: '';
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(
+    circle,
+    rgba(74, 108, 247, 0.1) 0%,
+    rgba(255, 123, 0, 0.05) 50%,
+    transparent 70%
+  );
+  filter: blur(25px);
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  pointer-events: none;
 }
 
 /* Features Section */
@@ -454,11 +441,27 @@
   .feature-card:hover::before {
     height: 5px;
   }
+  
+  .landing-image {
+    margin-top: 30px;
+  }
 }
 
 @media (max-width: 768px) {
   .title {
     font-size: 2.3rem;
+  }
+  
+  .landing-image {
+    max-width: 90%;
+  }
+  
+  .hero-section {
+    flex-direction: column;
+  }
+  
+  .hero-content, .hero-visual {
+    width: 100%;
   }
   
   .subtitle {
@@ -495,10 +498,5 @@
   
   .hero-section {
     padding: 80px 0 40px;
-  }
-  
-  .impostor-illustration {
-    width: 250px;
-    height: 250px;
   }
 }

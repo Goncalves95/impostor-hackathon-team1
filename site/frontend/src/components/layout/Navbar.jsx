@@ -48,51 +48,55 @@ function Navbar() {
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <Link to="/" className="logo" onClick={closeMenu}>
-          <span>📝</span> Level Up Hub
+          <img
+            src="images/site/logo.png"
+            alt="LevelUpHub Logo"
+            className="logo-image"
+          />
         </Link>
-        
+
         <div className="menu-icon" onClick={toggleMenu}>
           {isMenuOpen ? '✕' : '☰'}
         </div>
-        
+
         <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-          <Link to="/" 
-            className={`nav-link ${isActive('/') ? 'active' : ''}`} 
+          <Link to="/"
+            className={`nav-link ${isActive('/') ? 'active' : ''}`}
             onClick={closeMenu}
           >
             Home
           </Link>
-          
-          <Link to="/about" 
-            className={`nav-link ${isActive('/about') ? 'active' : ''}`} 
+
+          <Link to="/about"
+            className={`nav-link ${isActive('/about') ? 'active' : ''}`}
             onClick={closeMenu}
           >
             About
           </Link>
-          
+
           {currentUser ? (
             <>
-              <Link to="/dashboard" 
-                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} 
+              <Link to="/dashboard"
+                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
                 onClick={closeMenu}
               >
                 Dashboard
               </Link>
-              
-              <Link to="/builder" 
-                className={`nav-link ${isActive('/builder') ? 'active' : ''}`} 
+
+              <Link to="/builder"
+                className={`nav-link ${isActive('/builder') ? 'active' : ''}`}
                 onClick={closeMenu}
               >
                 Create Portfolio
               </Link>
-              
-              <Link to="/preview" 
-                className={`nav-link ${isActive('/preview') ? 'active' : ''}`} 
+
+              <Link to="/preview"
+                className={`nav-link ${isActive('/preview') ? 'active' : ''}`}
                 onClick={closeMenu}
               >
                 Preview
               </Link>
-              
+
               <button className="nav-button" onClick={() => {
                 handleLogout();
                 closeMenu();
@@ -102,15 +106,15 @@ function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" 
-                className={`nav-link ${isActive('/login') ? 'active' : ''}`} 
+              <Link to="/login"
+                className={`nav-link ${isActive('/login') ? 'active' : ''}`}
                 onClick={closeMenu}
               >
                 Login
               </Link>
-              
-              <button 
-                className="nav-button primary" 
+
+              <button
+                className="nav-button primary"
                 onClick={() => {
                   navigate('/register');
                   closeMenu();
