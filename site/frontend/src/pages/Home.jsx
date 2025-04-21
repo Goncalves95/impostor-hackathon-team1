@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import '../styles/Home.css';
+// Importar as imagens
 
 function Home() {
   // Effects to run on component mount
@@ -85,8 +86,8 @@ function Home() {
         
         <div className="hero-visual">
           <div className="impostor-illustration">
-            <div className="mask"></div>
-            <div className="real-face"></div>
+            <img src= 'images/site/landing_mock_1.png' alt="Portfolio Builder Preview" 
+    className="landing-image" />
           </div>
         </div>
       </motion.section>

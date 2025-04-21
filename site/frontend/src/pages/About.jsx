@@ -40,7 +40,7 @@ const AboutPage = () => {
       github: "https://github.com/Goncalves95"
     },
     {
-      name: "Team Member 3",
+      name: "Patricia Lacerda",
       role: "Junior Software Developer",
       bio: "I’m passionate about bringing creative, efficient solutions to life through code. Skilled in HTML, CSS, JavaScript, Python, and React.",
       image: "/images/team/pati.jpeg",
